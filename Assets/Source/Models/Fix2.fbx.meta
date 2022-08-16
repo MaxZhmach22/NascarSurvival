@@ -1,0 +1,324 @@
+fileFormatVersion: 2
+guid: 11f484535f3c8d241bf117a4bd9e7514
+ModelImporter:
+  serializedVersion: 20200
+  internalIDToNameTable:
+  - first:
+      74: 6600391695891622127
+    second: Bip001|Bip001 Footsteps|Take 001|BaseLayer
+  - first:
+      74: -2637515975879561582
+    second: Bip001|Bip001 Footsteps|Take 001|BaseLayer.001
+  - first:
+      74: -4449781122294624311
+    second: Bip001|Bip001|Take 001|BaseLayer
+  - first:
+      74: -9129430066443040822
+    second: Bip001|Bip001|Take 001|BaseLayer.001
+  - first:
+      74: 5837023084820608219
+    second: Bip001|Eye.L|Take 001|BaseLayer
+  - first:
+      74: 6402886634751941430
+    second: Bip001|Eye.L|Take 001|BaseLayer.001
+  - first:
+      74: -1896334337509692673
+    second: Bip001|Eye.R|Take 001|BaseLayer
+  - first:
+      74: 215656185383554884
+    second: Bip001|Eye.R|Take 001|BaseLayer.001
+  - first:
+      74: -1785474771755236408
+    second: Bip001|Retopo_Sphere.001|Take 001|BaseLayer
+  - first:
+      74: 7741312755472853305
+    second: Bip001|Retopo_Sphere.001|Take 001|BaseLayer.001
+  - first:
+      74: -3268136493699492463
+    second: Bip001|Retopo_Sphere.002|Take 001|BaseLayer
+  - first:
+      74: -7543186083232412218
+    second: Bip001|Retopo_Sphere.002|Take 001|BaseLayer.001
+  - first:
+      74: 5862543501114407046
+    second: Armature|Armature|Take 001|BaseLayer
+  - first:
+      74: 6965887883897901302
+    second: Armature|Armature|Take 001|BaseLayer.001
+  - first:
+      74: -8639080883647962089
+    second: Armature|Bip001 Footsteps|Take 001|BaseLayer
+  - first:
+      74: 6133105546462792195
+    second: Armature|Bip001 Footsteps|Take 001|BaseLayer.001
+  - first:
+      74: 5859973698540291942
+    second: Armature|Bip001|Take 001|BaseLayer
+  - first:
+      74: 2352496017613285847
+    second: Armature|Bip001|Take 001|BaseLayer.001
+  - first:
+      74: -2824570815373986009
+    second: Armature|Eye.L|Take 001|BaseLayer
+  - first:
+      74: 7953334839064482959
+    second: Armature|Eye.L|Take 001|BaseLayer.001
+  - first:
+      74: -2048003541547757891
+    second: Armature|Eye.R|Take 001|BaseLayer
+  - first:
+      74: -5028865486202013004
+    second: Armature|Eye.R|Take 001|BaseLayer.001
+  - first:
+      74: -2070097236945835996
+    second: Armature|Retopo_Sphere.001|Take 001|BaseLayer
+  - first:
+      74: -5761611256149804738
+    second: Armature|Retopo_Sphere.001|Take 001|BaseLayer.001
+  - first:
+      74: -3786608066578600427
+    second: Armature|Retopo_Sphere.002|Take 001|BaseLayer
+  - first:
+      74: -4136020737087119139
+    second: Armature|Retopo_Sphere.002|Take 001|BaseLayer.001
+  - first:
+      74: -749449599113460165
+    second: Eye.L|Bip001 Footsteps|Take 001|BaseLayer
+  - first:
+      74: 6497017467029230895
+    second: Eye.L|Bip001 Footsteps|Take 001|BaseLayer.001
+  - first:
+      74: -5327015971418585414
+    second: Eye.L|Bip001|Take 001|BaseLayer
+  - first:
+      74: 9070221851451155127
+    second: Eye.L|Bip001|Take 001|BaseLayer.001
+  - first:
+      74: -2450131467874364935
+    second: Eye.L|Eye.L|Take 001|BaseLayer
+  - first:
+      74: -6196834086279433812
+    second: Eye.L|Eye.L|Take 001|BaseLayer.001
+  - first:
+      74: 4140166530662642842
+    second: Eye.L|Eye.R|Take 001|BaseLayer
+  - first:
+      74: 6942954848556041340
+    second: Eye.L|Eye.R|Take 001|BaseLayer.001
+  - first:
+      74: -8417266086223584560
+    second: Eye.L|Retopo_Sphere.001|Take 001|BaseLayer
+  - first:
+      74: -3367430803497822526
+    second: Eye.L|Retopo_Sphere.001|Take 001|BaseLayer.001
+  - first:
+      74: -2688119515854859632
+    second: Eye.L|Retopo_Sphere.002|Take 001|BaseLayer
+  - first:
+      74: 6077704074671667213
+    second: Eye.L|Retopo_Sphere.002|Take 001|BaseLayer.001
+  - first:
+      74: 1966448032257595605
+    second: Eye.R|Bip001 Footsteps|Take 001|BaseLayer
+  - first:
+      74: -4623071016912147567
+    second: Eye.R|Bip001 Footsteps|Take 001|BaseLayer.001
+  - first:
+      74: -1640116709472900494
+    second: Eye.R|Bip001|Take 001|BaseLayer
+  - first:
+      74: -9029134009053343179
+    second: Eye.R|Bip001|Take 001|BaseLayer.001
+  - first:
+      74: -9144523612138342890
+    second: Eye.R|Eye.L|Take 001|BaseLayer
+  - first:
+      74: -140773461178531923
+    second: Eye.R|Eye.L|Take 001|BaseLayer.001
+  - first:
+      74: 5803596274972128443
+    second: Eye.R|Eye.R|Take 001|BaseLayer
+  - first:
+      74: -8420275224450151344
+    second: Eye.R|Eye.R|Take 001|BaseLayer.001
+  - first:
+      74: -1286754779010238531
+    second: Eye.R|Retopo_Sphere.001|Take 001|BaseLayer
+  - first:
+      74: -5096632124418629947
+    second: Eye.R|Retopo_Sphere.001|Take 001|BaseLayer.001
+  - first:
+      74: 8008610059070688359
+    second: Eye.R|Retopo_Sphere.002|Take 001|BaseLayer
+  - first:
+      74: -8429832816345061758
+    second: Eye.R|Retopo_Sphere.002|Take 001|BaseLayer.001
+  - first:
+      74: 4637501879358473743
+    second: Retopo_Sphere.001|Bip001 Footsteps|Take 001|BaseLayer
+  - first:
+      74: -7517765097328745998
+    second: Retopo_Sphere.001|Bip001 Footsteps|Take 001|BaseLayer.001
+  - first:
+      74: -604355882523266132
+    second: Retopo_Sphere.001|Bip001|Take 001|BaseLayer
+  - first:
+      74: -1062941573909039289
+    second: Retopo_Sphere.001|Bip001|Take 001|BaseLayer.001
+  - first:
+      74: -8525439986175192081
+    second: Retopo_Sphere.001|Eye.L|Take 001|BaseLayer
+  - first:
+      74: -3134156142481252053
+    second: Retopo_Sphere.001|Eye.L|Take 001|BaseLayer.001
+  - first:
+      74: -9009323758961169072
+    second: Retopo_Sphere.001|Eye.R|Take 001|BaseLayer
+  - first:
+      74: -1749777760700974525
+    second: Retopo_Sphere.001|Eye.R|Take 001|BaseLayer.001
+  - first:
+      74: 8402510854980808254
+    second: Retopo_Sphere.001|Retopo_Sphere.001|Take 001|BaseLayer
+  - first:
+      74: -727665348043368722
+    second: Retopo_Sphere.001|Retopo_Sphere.001|Take 001|BaseLayer.001
+  - first:
+      74: 5779616033994002526
+    second: Retopo_Sphere.001|Retopo_Sphere.002|Take 001|BaseLayer
+  - first:
+      74: 3487076471086630160
+    second: Retopo_Sphere.001|Retopo_Sphere.002|Take 001|BaseLayer.001
+  - first:
+      74: 4113819017049017227
+    second: Retopo_Sphere.002|Bip001 Footsteps|Take 001|BaseLayer
+  - first:
+      74: 9014043042262115335
+    second: Retopo_Sphere.002|Bip001 Footsteps|Take 001|BaseLayer.001
+  - first:
+      74: -8100914869189731929
+    second: Retopo_Sphere.002|Bip001|Take 001|BaseLayer
+  - first:
+      74: -9205273573448622734
+    second: Retopo_Sphere.002|Bip001|Take 001|BaseLayer.001
+  - first:
+      74: 5443306693342352047
+    second: Retopo_Sphere.002|Eye.L|Take 001|BaseLayer
+  - first:
+      74: -6897885506341490614
+    second: Retopo_Sphere.002|Eye.L|Take 001|BaseLayer.001
+  - first:
+      74: 2280120426414872754
+    second: Retopo_Sphere.002|Eye.R|Take 001|BaseLayer
+  - first:
+      74: 905316751762113278
+    second: Retopo_Sphere.002|Eye.R|Take 001|BaseLayer.001
+  - first:
+      74: -1987953397142041213
+    second: Retopo_Sphere.002|Retopo_Sphere.001|Take 001|BaseLayer
+  - first:
+      74: -8001863728521587736
+    second: Retopo_Sphere.002|Retopo_Sphere.001|Take 001|BaseLayer.001
+  - first:
+      74: -7419668000644867450
+    second: Retopo_Sphere.002|Retopo_Sphere.002|Take 001|BaseLayer
+  - first:
+      74: 5194643408816376795
+    second: Retopo_Sphere.002|Retopo_Sphere.002|Take 001|BaseLayer.001
+  externalObjects: {}
+  materials:
+    materialImportMode: 2
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 0
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 0.1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    fileIdsGeneration: 2
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 1
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  humanDescription:
+    serializedVersion: 3
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 0.1
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 2
+  humanoidOversampling: 1
+  avatarSetup: 0
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
