@@ -8,6 +8,7 @@ public class TestInstaller : MonoInstaller
     [field: BoxGroup("Settings:")] [field: SerializeField] public DynamicJoystick DynamicJoystick { get; private set; }
     [field: BoxGroup("Settings:")] [field: SerializeField] public HeroInitializer HeroInitializer { get; private set; }
     [field: BoxGroup("Settings:")] [field: SerializeField] public HeroSettings HeroSettings { get; private set; }
+    [field: BoxGroup("Settings:")] [field: SerializeField] public FinishZone FinishZone { get; private set; }
     
     public override void InstallBindings()
     {
@@ -17,6 +18,8 @@ public class TestInstaller : MonoInstaller
        Container.Bind<DynamicJoystick>().FromInstance(DynamicJoystick).AsSingle();
        Container.Bind<HeroInitializer>().FromInstance(HeroInitializer).AsSingle();
        Container.Bind<HeroSettings>().FromInstance(HeroSettings).AsSingle();
+       Container.Bind<FinishZone>().FromInstance(FinishZone).AsSingle();
+       Container.Bind<LoadSceneHandler>().FromInstance(new LoadSceneHandler()).AsSingle();
        //Container.Bind<HeroMovement>().AsSingle();
        Container.Bind<GameStateHandler>().FromInstance(new GameStateHandler()).AsSingle();
     }
