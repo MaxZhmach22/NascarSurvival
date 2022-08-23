@@ -19,7 +19,6 @@ public class TestInstaller : MonoInstaller
        Container.Bind<HeroInitializer>().FromInstance(HeroInitializer).AsSingle();
        Container.Bind<HeroSettings>().FromInstance(HeroSettings).AsSingle();
        Container.Bind<FinishZone>().FromInstance(FinishZone).AsSingle();
-       Container.Bind<LoadSceneHandler>().FromInstance(new LoadSceneHandler()).AsSingle();
        //Container.Bind<HeroMovement>().AsSingle();
        Container.Bind<GameStateHandler>().FromInstance(new GameStateHandler()).AsSingle();
     }

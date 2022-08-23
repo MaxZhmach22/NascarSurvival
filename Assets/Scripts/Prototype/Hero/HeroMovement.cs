@@ -1,7 +1,7 @@
 using System;
 using UniRx;
 using UnityEngine;
-using Zenject;
+
 
 namespace NascarSurvival
 {
@@ -58,6 +58,7 @@ namespace NascarSurvival
                 .DoOnTerminate(() =>
                 {
                     Debug.Log("<color=red>Stopped!</color>");
+                    new LoadSceneHandler().LoadNextScene();
                 })
                 .Subscribe(_ => StartDecelerationMovement())
                 .AddTo(_disposable);

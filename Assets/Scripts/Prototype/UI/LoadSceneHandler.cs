@@ -15,31 +15,32 @@ namespace NascarSurvival
 
         public LoadSceneHandler()
         {
-            // if (PlayerPrefs.HasKey(CounterLevels))
-            // {
-            //     _counterLevels = PlayerPrefs.GetInt(CounterLevels);
-            // }
-            //
-            // if (SceneManager.GetActiveScene().buildIndex == 0)
-            // {
-            //     if (PlayerPrefs.HasKey(KeyLevel))
-            //     {
-            //         _indexActiveScene = PlayerPrefs.GetInt(KeyLevel);
-            //     }
-            //     
-            //     if (_indexActiveScene == -1 || _indexActiveScene >= SceneManager.sceneCountInBuildSettings)
-            //     {
-            //         LoadScene(1);
-            //     }
-            //     else
-            //     {
-            //         LoadScene(_indexActiveScene);
-            //     }
-            // }
-            // else
-            // {
-            //     _indexActiveScene = SceneManager.GetActiveScene().buildIndex;
-            // }
+            if (PlayerPrefs.HasKey(CounterLevels))
+            {
+                _counterLevels = PlayerPrefs.GetInt(CounterLevels);
+            }
+
+            if (SceneManager.GetActiveScene().buildIndex == 0)
+            {
+                if (PlayerPrefs.HasKey(KeyLevel))
+                {
+                    _indexActiveScene = PlayerPrefs.GetInt(KeyLevel);
+                }
+                     
+                if (_indexActiveScene == -1 || _indexActiveScene >= SceneManager.sceneCountInBuildSettings)
+                {
+                    LoadScene(1);
+                }
+                else
+                {
+                    LoadScene(_indexActiveScene);
+                }
+            }
+            else
+            {
+                _indexActiveScene = SceneManager.GetActiveScene().buildIndex;
+                Debug.Log($"Scene index{_indexActiveScene}");
+            }
         }
         
         public void LoadNextScene()

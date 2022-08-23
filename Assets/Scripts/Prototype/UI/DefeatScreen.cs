@@ -12,7 +12,7 @@ namespace NascarSurvival
         [SerializeField] private Button _restartButton;
         private LoadSceneHandler _loadSceneHandler;
 
-        [Inject]
+        
         private void Init(LoadSceneHandler loadSceneHandler)
         {
             _loadSceneHandler = loadSceneHandler;
