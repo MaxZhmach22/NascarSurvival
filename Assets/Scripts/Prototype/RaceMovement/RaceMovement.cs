@@ -1,22 +1,29 @@
 using System;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using UniRx;
 using UnityEngine;
 
 
 namespace NascarSurvival
 {
-    public class HeroMovement : IDisposable
+    public class RaceMovement : IDisposable
     {
+        public float CurrentSpeed => _lengthOfTheVector;
+        
         private GameStateHandler _gameStateHandler;
-        private DynamicJoystick _dynamicJoystick;
+        private IMoveController _dynamicJoystick;
         private CompositeDisposable _disposable = new CompositeDisposable();
+        private CancellationTokenSource _cancellationToken = new CancellationTokenSource();
         private HeroSettings _heroSettings;
         private FinishZone _finisZone;
         private float _currentSpeed;
+        private float _lengthOfTheVector;
         private bool _bonusSpeedEffect;
 
 
-        public HeroMovement(DynamicJoystick dynamicJoystick, 
+        public RaceMovement(IMoveController dynamicJoystick, 
             GameStateHandler gameStateHandler, 
             HeroSettings heroSettings, 
             FinishZone finisZone)
@@ -31,7 +38,7 @@ namespace NascarSurvival
 
             Observable.EveryUpdate()
                 .Where(_ => Input.GetKeyDown(KeyCode.A))
-                .Subscribe(_ => BonusSpeedEffect(10, 3, 5))
+                .Subscribe(_ => BonusSpeedEffect(5, 5, 5))
                 .AddTo(_disposable);
         }
 
@@ -52,7 +59,6 @@ namespace NascarSurvival
         private void ConstantMovementSequence()
         {
             Observable.EveryUpdate()
-                .Where(_ => !_bonusSpeedEffect)
                 .TakeWhile(_ => _heroSettings.transform.position.z < _finisZone.transform.position.z)
                 .DoOnTerminate(() => DecelerationMovement())
                 .Subscribe(_ => ConstantForwardMovement())
@@ -88,37 +94,45 @@ namespace NascarSurvival
         private void ConstantForwardMovement()
         {
             var constantForwardVector = Vector3.forward * _currentSpeed;
-            var joystickAddition = new Vector3(_dynamicJoystick.Horizontal,0, _dynamicJoystick.Vertical) * _heroSettings.Speed;
-            _heroSettings.transform.position += (constantForwardVector + joystickAddition) * Time.deltaTime;
+            var joystickAddition = new Vector3(_dynamicJoystick.Movement.x,0, _dynamicJoystick.Movement.y) * _heroSettings.Speed;
+            var vectorToAdd = (constantForwardVector + joystickAddition);
+            _heroSettings.transform.position += vectorToAdd * Time.deltaTime;
             var clampBorders = Mathf.Clamp(_heroSettings.transform.position.x, -5, 5);
             _heroSettings.transform.position = new Vector3(clampBorders, _heroSettings.transform.position.y,
                 _heroSettings.transform.position.z);
+
+            _lengthOfTheVector = vectorToAdd.sqrMagnitude;
         }
 
-        public void BonusSpeedEffect(float bonusToSpeed, float acceletartionTime, float activeTime)
+        public async void BonusSpeedEffect(float bonusToSpeed, float acceletartionTime, float activeTime)
         {
-            Observable
-                .Timer(TimeSpan.FromSeconds(acceletartionTime))
-                .DoOnSubscribe(() => Debug.Log("Bonus activated"))
-                .DoOnTerminate(() =>
-                {
-                    Debug.Log("acceletartionTime");
-                    
-                    Observable.Timer
-                        (TimeSpan.FromSeconds(activeTime))
-                        .DoOnTerminate(() => Debug.Log("Bonus end"))
-                        .Subscribe(_ => Debug.Log(activeTime))
-                        .AddTo(_disposable);
-                    
-                })
-                .Subscribe(_ => Debug.Log(""))
-                .AddTo(_disposable);
+            var startSpeed = _currentSpeed;
+            var allSpeed = _currentSpeed + bonusToSpeed;
             
-           
+            DOTween.To(() => _currentSpeed, x => _currentSpeed = x, allSpeed, acceletartionTime)
+                .SetEase(Ease.Linear)
+                .OnStart(() =>
+                {
+                    _bonusSpeedEffect = true;
+                    Debug.Log("Start accelerate");
+                })
+                .OnComplete(() => Debug.Log(_currentSpeed));
+            
+            await UniTask.Delay(TimeSpan.FromSeconds(activeTime + acceletartionTime), cancellationToken: _cancellationToken.Token);
+            
+            DOTween.To(() => _currentSpeed, x => _currentSpeed = x, startSpeed, acceletartionTime)
+                .SetEase(Ease.Linear)
+                .OnStart(() => Debug.Log("Start deccelerate"))
+                .OnComplete(() =>
+                {
+                    _bonusSpeedEffect = false;
+                    Debug.Log(_currentSpeed);
+                });
         }
 
         public void Dispose()
         {
+            _cancellationToken.Cancel();
             _disposable.Clear();
         }
     }

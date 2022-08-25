@@ -1,37 +1,35 @@
+using System;
 using DG.Tweening;
 using UniRx;
 using UnityEngine;
 using Zenject;
 
-
 namespace NascarSurvival
 {
-    [DisallowMultipleComponent]
-    [RequireComponent(typeof(HeroSettings))]
-    public class HeroInitializer : MonoBehaviour
+    public class EnemyInitializer : MonoBehaviour
     {
         private RaceMovement raceMovement;
         private HeroSettings _heroSettings;
-        private IMoveController _dynamicJoystick;
+        private DynamicJoystick _dynamicJoystick;
         private GameStateHandler _gameStateHandler;
         private FinishZone _finishZone;
         private GameUI _gameUI;
         private int _previousValue;
 
-        [Inject]
-        private void SetReferences(
-            GameStateHandler gameStateHandler, 
-            IMoveController dynamicJoystick, 
-            HeroSettings heroSettings,
-            FinishZone finishZone,
-            GameUI gameUI)
-        {
-            _gameStateHandler = gameStateHandler;
-            _dynamicJoystick = dynamicJoystick;
-            _heroSettings = heroSettings;
-            _finishZone = finishZone;
-            _gameUI = gameUI;
-        }
+        // [Inject]
+        // private void SetReferences(
+        //     GameStateHandler gameStateHandler, 
+        //     DynamicJoystick dynamicJoystick, 
+        //     HeroSettings heroSettings,
+        //     FinishZone finishZone,
+        //     GameUI gameUI)
+        // {
+        //     _gameStateHandler = gameStateHandler;
+        //     _dynamicJoystick = dynamicJoystick;
+        //     _heroSettings = heroSettings;
+        //     _finishZone = finishZone;
+        //     _gameUI = gameUI;
+        // }
         
         private void Start()
         {

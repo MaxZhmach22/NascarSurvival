@@ -1,13 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using NascarSurvival;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class DynamicJoystick : Joystick
+public class DynamicJoystick : Joystick, IMoveController
 {
+    public Vector2 Movement => new Vector2(Horizontal,Vertical);
     public float MoveThreshold { get { return moveThreshold; } set { moveThreshold = Mathf.Abs(value); } }
 
     [SerializeField] private float moveThreshold = 1;
+
 
     protected override void Start()
     {

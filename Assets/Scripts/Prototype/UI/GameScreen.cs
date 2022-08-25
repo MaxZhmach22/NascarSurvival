@@ -1,3 +1,4 @@
+using NaughtyAttributes;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,18 +9,12 @@ namespace NascarSurvival
 {
     public class GameScreen : MonoBehaviour
     {
-        [SerializeField] private Button _restartButton;
-        private LoadSceneHandler _loadSceneHandler;
-        
-        private void Init(LoadSceneHandler loadSceneHandler)
-        {
-            _loadSceneHandler = loadSceneHandler;
-        }
+        [field: Foldout("References")] [field: SerializeField] public Button RestartButton { get; private set; }
         
         private void Awake()
         {
-            _restartButton.OnClickAsObservable()
-                .Subscribe(_ => _loadSceneHandler.ReloadCurrentScene())
+            RestartButton.OnClickAsObservable()
+                .Subscribe(_ => new LoadSceneHandler().ReloadCurrentScene())
                 .AddTo(this);
         }
     }
