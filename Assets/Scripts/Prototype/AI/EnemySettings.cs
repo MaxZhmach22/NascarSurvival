@@ -1,13 +1,11 @@
 ﻿using NaughtyAttributes;
 using UnityEngine;
 
-namespace Prototype.AI
+
+namespace NascarSurvival
 {
-    public class EnemySettings : MonoBehaviour
+    public class EnemySettings : ObjectSettings
     {
-        [field: BoxGroup("Move Settings")] [field: SerializeField] public float Speed { get; private set; } = 1f;
-        [field: BoxGroup("Move Settings")] [field: SerializeField] public float StartSpeedToAccelerate { get; private set; } = 5f;
-        [field: BoxGroup("Move Settings")] [field: SerializeField] public float StartAccelerationTime { get; private set; } = 1f;
         [field: Space(20f)]
         [field: Range(1, 100)] [field: BoxGroup("Chances:")] [field: SerializeField] public int ChanceToPickUpBonus { get; private set; } = 50;
         [field: Range(1, 100)] [field: BoxGroup("Chances:")] [field: SerializeField] public int ChanceToIncreasePower { get; private set; } = 50;

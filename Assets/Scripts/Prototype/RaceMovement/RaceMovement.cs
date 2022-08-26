@@ -11,26 +11,26 @@ namespace NascarSurvival
     public class RaceMovement : IDisposable
     {
         public float CurrentSpeed => _lengthOfTheVector;
-        
-        private GameStateHandler _gameStateHandler;
-        private IMoveController _dynamicJoystick;
-        private CompositeDisposable _disposable = new CompositeDisposable();
-        private CancellationTokenSource _cancellationToken = new CancellationTokenSource();
-        private HeroSettings _heroSettings;
-        private FinishZone _finisZone;
+
         private float _currentSpeed;
         private float _lengthOfTheVector;
         private bool _bonusSpeedEffect;
+        private readonly GameStateHandler _gameStateHandler;
+        private readonly IMoveController _movingController;
+        private readonly CompositeDisposable _disposable = new CompositeDisposable();
+        private readonly CancellationTokenSource _cancellationToken = new CancellationTokenSource();
+        private readonly ObjectSettings _objectSettings;
+        private readonly FinishZone _finisZone;
 
 
-        public RaceMovement(IMoveController dynamicJoystick, 
+        public RaceMovement(IMoveController movingController, 
             GameStateHandler gameStateHandler, 
-            HeroSettings heroSettings, 
+            ObjectSettings objectSettings, 
             FinishZone finisZone)
         {
-            _dynamicJoystick = dynamicJoystick;
+            _movingController = movingController;
             _gameStateHandler = gameStateHandler;
-            _heroSettings = heroSettings;
+            _objectSettings = objectSettings;
             _finisZone = finisZone;
 
             AccelerationSequence();
@@ -46,7 +46,7 @@ namespace NascarSurvival
         {
             Observable.EveryUpdate()
                 .Where(_ => _gameStateHandler.CurrentGameState == GameStates.Start)
-                .TakeWhile(_ => _currentSpeed < _heroSettings.StartSpeedToAccelerate)
+                .TakeWhile(_ => _currentSpeed < _objectSettings.StartSpeedToAccelerate)
                 .DoOnTerminate(() =>
                 {
                     ConstantMovementSequence();
@@ -59,7 +59,7 @@ namespace NascarSurvival
         private void ConstantMovementSequence()
         {
             Observable.EveryUpdate()
-                .TakeWhile(_ => _heroSettings.transform.position.z < _finisZone.transform.position.z)
+                .TakeWhile(_ => _objectSettings.transform.position.z < _finisZone.transform.position.z)
                 .DoOnTerminate(() => DecelerationMovement())
                 .Subscribe(_ => ConstantForwardMovement())
                 .AddTo(_disposable);
@@ -79,27 +79,27 @@ namespace NascarSurvival
 
         private void StartAccelerationMovement()
         { 
-            _currentSpeed += Time.deltaTime * _heroSettings.StartAccelerationTime;
-            _currentSpeed = Mathf.Clamp(_currentSpeed, 0, _heroSettings.StartSpeedToAccelerate);
-            _heroSettings.transform.position += Vector3.forward * _currentSpeed * Time.deltaTime;
+            _currentSpeed += Time.deltaTime * _objectSettings.StartAccelerationTime;
+            _currentSpeed = Mathf.Clamp(_currentSpeed, 0, _objectSettings.StartSpeedToAccelerate);
+            _objectSettings.transform.position += Vector3.forward * _currentSpeed * Time.deltaTime;
         }
         
         private void StartDecelerationMovement()
         { 
-            _currentSpeed -= Time.deltaTime * _heroSettings.StartAccelerationTime;
-            _currentSpeed = Mathf.Clamp(_currentSpeed, 0, _heroSettings.StartSpeedToAccelerate);
-            _heroSettings.transform.position += Vector3.forward * _currentSpeed * Time.deltaTime;
+            _currentSpeed -= Time.deltaTime * _objectSettings.StartAccelerationTime;
+            _currentSpeed = Mathf.Clamp(_currentSpeed, 0, _objectSettings.StartSpeedToAccelerate);
+            _objectSettings.transform.position += Vector3.forward * _currentSpeed * Time.deltaTime;
         }
         
         private void ConstantForwardMovement()
         {
             var constantForwardVector = Vector3.forward * _currentSpeed;
-            var joystickAddition = new Vector3(_dynamicJoystick.Movement.x,0, _dynamicJoystick.Movement.y) * _heroSettings.Speed;
+            var joystickAddition = new Vector3(_movingController.Movement.x,0, _movingController.Movement.y) * _objectSettings.Speed;
             var vectorToAdd = (constantForwardVector + joystickAddition);
-            _heroSettings.transform.position += vectorToAdd * Time.deltaTime;
-            var clampBorders = Mathf.Clamp(_heroSettings.transform.position.x, -5, 5);
-            _heroSettings.transform.position = new Vector3(clampBorders, _heroSettings.transform.position.y,
-                _heroSettings.transform.position.z);
+            _objectSettings.transform.position += vectorToAdd * Time.deltaTime;
+            var clampBorders = Mathf.Clamp(_objectSettings.transform.position.x, -5, 5);
+            _objectSettings.transform.position = new Vector3(clampBorders, _objectSettings.transform.position.y,
+                _objectSettings.transform.position.z);
 
             _lengthOfTheVector = vectorToAdd.sqrMagnitude;
         }

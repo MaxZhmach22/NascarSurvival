@@ -4,6 +4,7 @@ using UniRx;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+
 namespace Prototype.AI
 {
     public class AiBehaviour : IDisposable 
@@ -22,28 +23,26 @@ namespace Prototype.AI
 
         private void CreateSequence()
         {
-            Observable.Timer(TimeSpan.FromSeconds(_enemySettings.TimeToSwitchBehaviour))
-                .DoOnSubscribe(() => _aiMovementController.Movement = new Vector2(0, _enemySettings.MaxPowerOfCar / 100))
+            Observable.Interval(TimeSpan.FromSeconds(_enemySettings.TimeToSwitchBehaviour))
+                .DoOnSubscribe(() => _aiMovementController.Movement = new Vector2(0, _enemySettings.MaxPowerOfCar / 100f))
                 .Subscribe(_ =>
                 {
                     CheckPowerChances();
-                    
                 })
                 .AddTo(_disposable);
-
         }
 
         private void CheckPowerChances()
         {
             if (TakeRandomBool(_enemySettings.ChanceToIncreasePower))
             {
-                _aiMovementController.Movement += new Vector2(1, _enemySettings.ValueToIncrease);
-                Debug.Log($"Speed increase");
+                _aiMovementController.Movement += new Vector2(0, _enemySettings.ValueToIncrease / 100f);
+                Debug.Log($"Speed increase {_aiMovementController.Movement.y}");
             }
             else
             {
-                _aiMovementController.Movement -= new Vector2(1, _enemySettings.ValueToIncrease);
-                Debug.Log($"Speed decrease");
+                _aiMovementController.Movement -= new Vector2(0, _enemySettings.ValueToIncrease / 100f);
+                Debug.Log($"Speed decrease {_aiMovementController.Movement.y}");
             }
         }
 

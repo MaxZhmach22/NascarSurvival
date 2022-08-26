@@ -1,5 +1,6 @@
 using NascarSurvival;
 using NaughtyAttributes;
+using Prototype.AI;
 using UnityEngine;
 using Zenject;
 
