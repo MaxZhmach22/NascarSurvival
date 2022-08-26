@@ -60,9 +60,20 @@ namespace NascarSurvival
         {
             Observable.EveryUpdate()
                 .TakeWhile(_ => _objectSettings.transform.position.z < _finisZone.transform.position.z)
-                .DoOnTerminate(() => DecelerationMovement())
+                .DoOnTerminate(() =>
+                {
+                    EndGame();
+                    
+                })
                 .Subscribe(_ => ConstantForwardMovement())
                 .AddTo(_disposable);
+        }
+
+        private void EndGame()
+        {
+            DecelerationMovement();
+            var state = _movingController is DynamicJoystick ? GameStates.Finish : GameStates.Defeat;
+            _gameStateHandler.ChangeState(state);
         }
 
         private void DecelerationMovement()

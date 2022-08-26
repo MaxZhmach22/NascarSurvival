@@ -1,4 +1,5 @@
 using DG.Tweening;
+using NascarSurvival.Collectable;
 using UniRx;
 using UnityEngine;
 using Zenject;
@@ -8,14 +9,15 @@ namespace NascarSurvival
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(HeroSettings))]
-    public class HeroInitializer : MonoBehaviour
+    public class HeroInitializer : MonoBehaviour, IInitializer
     {
-        private RaceMovement raceMovement;
+        public RaceMovement RaceMovement { get; private set; }
         private HeroSettings _heroSettings;
         private IMoveController _dynamicJoystick;
         private GameStateHandler _gameStateHandler;
         private FinishZone _finishZone;
         private GameUI _gameUI;
+        private CollectablesSpawner collectablesSpawner;
         private int _previousValue;
 
         [Inject]
@@ -24,18 +26,20 @@ namespace NascarSurvival
             IMoveController dynamicJoystick, 
             HeroSettings heroSettings,
             FinishZone finishZone,
+            CollectablesSpawner collectablesSpawner,
             GameUI gameUI)
         {
             _gameStateHandler = gameStateHandler;
             _dynamicJoystick = dynamicJoystick;
             _heroSettings = heroSettings;
             _finishZone = finishZone;
+            this.collectablesSpawner = collectablesSpawner;
             _gameUI = gameUI;
         }
         
         private void Start()
         {
-            raceMovement = new RaceMovement(_dynamicJoystick, _gameStateHandler, _heroSettings, _finishZone);
+            RaceMovement = new RaceMovement(_dynamicJoystick, _gameStateHandler, _heroSettings, _finishZone);
             
 
             CreateSequence();
@@ -44,7 +48,7 @@ namespace NascarSurvival
 
         private void UiSubcribe()
         {
-            raceMovement.ObserveEveryValueChanged(x => x.CurrentSpeed)
+            RaceMovement.ObserveEveryValueChanged(x => x.CurrentSpeed)
                 .Select(x => (int) x)
                 .Subscribe(x =>
                 {
@@ -66,7 +70,8 @@ namespace NascarSurvival
 
         private void OnDestroy()
         {
-            raceMovement.Dispose();
+            collectablesSpawner.Dispose();
+            RaceMovement.Dispose();
         }
     }
 }

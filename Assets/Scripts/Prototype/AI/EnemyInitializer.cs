@@ -1,4 +1,3 @@
-using System;
 using Prototype.AI;
 using UnityEngine;
 using Zenject;
@@ -8,14 +7,13 @@ namespace NascarSurvival
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(EnemySettings))]
-    public class EnemyInitializer : MonoBehaviour
+    public class EnemyInitializer : MonoBehaviour, IInitializer
     {
-        private RaceMovement raceMovement;
+        public RaceMovement RaceMovement { get; private set; }
         private EnemySettings _enemySettings;
         private AIMovementController _aiMoveController;
         private GameStateHandler _gameStateHandler;
         private AiBehaviour _aiBehaviour;
-        private RaceMovement _raceMovement;
         private FinishZone _finishZone;
         
         [Inject]
@@ -37,7 +35,7 @@ namespace NascarSurvival
         {
             _aiMoveController = new AIMovementController();
             _aiBehaviour = new AiBehaviour(_enemySettings, _aiMoveController);
-            _raceMovement = new RaceMovement(_aiMoveController, _gameStateHandler, _enemySettings, _finishZone);
+            RaceMovement = new RaceMovement(_aiMoveController, _gameStateHandler, _enemySettings, _finishZone);
         }
         
         private void CreateSequence()
@@ -48,7 +46,7 @@ namespace NascarSurvival
         private void OnDestroy()
         {
             _aiBehaviour.Dispose();
-           _raceMovement.Dispose();
+            RaceMovement.Dispose();
         }
     }
 }

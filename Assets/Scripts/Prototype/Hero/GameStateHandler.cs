@@ -5,7 +5,7 @@ namespace NascarSurvival
     public class GameStateHandler
     {
         public static int Counter;
-        public Action<GameStates> OnChangeState { get; private set; }
+        public Action<GameStates> OnChangeState { get; set; }
         public GameStates CurrentGameState { get; private set; }
 
         public GameStateHandler()
