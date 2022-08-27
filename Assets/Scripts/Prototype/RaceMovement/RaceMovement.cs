@@ -10,17 +10,21 @@ namespace NascarSurvival
 {
     public class RaceMovement : IDisposable
     {
-        public float CurrentSpeed => _lengthOfTheVector;
+        public int CurrentSpeed => _lengthOfTheVector;
 
+        private float _constantForwardSpeed;
         private float _currentSpeed;
-        private float _lengthOfTheVector;
+      
+        private int _lengthOfTheVector;
         private bool _bonusSpeedEffect;
+        private Vector3 _acceleratedVector;
         private readonly GameStateHandler _gameStateHandler;
         private readonly IMoveController _movingController;
         private readonly CompositeDisposable _disposable = new CompositeDisposable();
         private readonly CancellationTokenSource _cancellationToken = new CancellationTokenSource();
         private readonly ObjectSettings _objectSettings;
         private readonly FinishZone _finisZone;
+        private float _startSpeedScalar;
 
 
         public RaceMovement(IMoveController movingController, 
@@ -32,7 +36,8 @@ namespace NascarSurvival
             _gameStateHandler = gameStateHandler;
             _objectSettings = objectSettings;
             _finisZone = finisZone;
-
+            _currentSpeed = _objectSettings.SensitiveXaxes;
+            
             AccelerationSequence();
             
             Observable.EveryUpdate()
@@ -43,21 +48,33 @@ namespace NascarSurvival
 
         private void AccelerationSequence()
         {
-            Observable.EveryUpdate()
-                .Where(_ => _gameStateHandler.CurrentGameState == GameStates.Start)
-                .TakeWhile(_ => _currentSpeed < _objectSettings.StartSpeedToAccelerate)
-                .DoOnTerminate(() =>
+            DOTween.To(() => _constantForwardSpeed, x => _constantForwardSpeed = x, _objectSettings.StartSpeedToAccelerate,
+                    _objectSettings.StartAccelerationTime)
+                .SetEase(Ease.Linear)
+                .OnUpdate(() => StartAccelerationMovement())
+                .OnComplete(() =>
                 {
+                    Debug.Log(_constantForwardSpeed);
                     ConstantMovementSequence();
-                    // Debug.Log("<color=red>Accelerated</color>");
-                })
-                .Subscribe(_ => StartAccelerationMovement())
-                .AddTo(_disposable);
+                });
+                
+                
+            //     
+            // Observable.EveryUpdate()
+            //     .Where(_ => _gameStateHandler.CurrentGameState == GameStates.Start)
+            //     .TakeWhile(_ => _currentSpeed < _objectSettings.StartSpeedToAccelerate)
+            //     .DoOnTerminate(() =>
+            //     {
+            //         ConstantMovementSequence();
+            //         // Debug.Log("<color=red>Accelerated</color>");
+            //     })
+            //     .Subscribe(_ => StartAccelerationMovement())
+            //     .AddTo(_disposable);
         }
         
         private void ConstantMovementSequence()
         {
-            Observable.EveryUpdate()
+            Observable.EveryFixedUpdate()
                 .TakeWhile(_ => _objectSettings.transform.position.z < _finisZone.transform.position.z)
                 .DoOnTerminate(() =>
                 {
@@ -78,7 +95,7 @@ namespace NascarSurvival
         private void DecelerationMovement()
         {
             Observable.EveryUpdate()
-                .TakeWhile(_ => _currentSpeed > 0)
+                .TakeWhile(_ => _constantForwardSpeed > 0)
                 .DoOnTerminate(() =>
                 {
                     // Debug.Log("<color=red>Stopped!</color>");
@@ -88,36 +105,49 @@ namespace NascarSurvival
         }
 
         private void StartAccelerationMovement()
-        { 
-            _currentSpeed += Time.deltaTime * _objectSettings.StartAccelerationTime;
-            _currentSpeed = Mathf.Clamp(_currentSpeed, 0, _objectSettings.StartSpeedToAccelerate);
-            _objectSettings.transform.position += Vector3.forward * _currentSpeed * Time.deltaTime;
+        {
+            // _acceleratedVector = Vector3.forward * 2 * _constantForwardSpeed * Time.deltaTime;
+            // _objectSettings.transform.position += _acceleratedVector;
+            //_lengthOfTheVector = _acceleratedVector.z * 500;
         }
         
         private void StartDecelerationMovement()
-        { 
-            _currentSpeed -= Time.deltaTime * _objectSettings.StartAccelerationTime;
-            _currentSpeed = Mathf.Clamp(_currentSpeed, 0, _objectSettings.StartSpeedToAccelerate);
-            _objectSettings.transform.position += Vector3.forward * _currentSpeed * Time.deltaTime;
+        {
+            _constantForwardSpeed -= Time.deltaTime * _objectSettings.StartAccelerationTime;
+            _constantForwardSpeed = Mathf.Clamp(_constantForwardSpeed, 0, _objectSettings.StartSpeedToAccelerate);
+            _objectSettings.transform.position +=_objectSettings.transform.forward + Vector3.forward * _constantForwardSpeed * Time.deltaTime;
         }
         
         private void ConstantForwardMovement()
         {
-            var constantForwardVector = Vector3.forward * _currentSpeed;
-            var joystickAddition = new Vector3(_movingController.Movement.x,0, _movingController.Movement.y) * _objectSettings.Speed;
-            var vectorToAdd = (constantForwardVector + joystickAddition);
-            _objectSettings.transform.position += vectorToAdd * Time.deltaTime;
+            var forwardControllerVector = Vector3.zero;
+            var rotation = Vector3.zero;
+            
+            if (_movingController is DynamicJoystick)
+            {
+                forwardControllerVector =
+                    new Vector3(0, 0, _movingController.Movement.y) * _currentSpeed * Time.deltaTime;
+                rotation = new Vector3(_movingController.Movement.x, 0, 0) * _objectSettings.SensitiveYaxes *
+                           Time.deltaTime;
+                _objectSettings.transform.position += rotation + forwardControllerVector * _startSpeedScalar;
+            }
+            else
+            {
+                forwardControllerVector = _objectSettings.transform.forward * _currentSpeed * Time.deltaTime;
+                _objectSettings.transform.position += forwardControllerVector * _startSpeedScalar;
+            }
+  
             var clampBorders = Mathf.Clamp(_objectSettings.transform.position.x, -5, 5);
             _objectSettings.transform.position = new Vector3(clampBorders, _objectSettings.transform.position.y,
                 _objectSettings.transform.position.z);
 
-            _lengthOfTheVector = vectorToAdd.sqrMagnitude;
+            //_lengthOfTheVector = forwardControllerVector.z + _acceleratedVector.z;
         }
 
         public async void BonusSpeedEffect(float bonusToSpeed, float acceletartionTime, float activeTime)
         {
-            var startSpeed = _currentSpeed;
-            var allSpeed = _currentSpeed + bonusToSpeed;
+            var startSpeed = _constantForwardSpeed;
+            var allSpeed = _constantForwardSpeed + bonusToSpeed;
             
             DOTween.To(() => _currentSpeed, x => _currentSpeed = x, allSpeed, acceletartionTime)
                 .SetEase(Ease.Linear)

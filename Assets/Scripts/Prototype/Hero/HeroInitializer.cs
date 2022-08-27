@@ -49,7 +49,6 @@ namespace NascarSurvival
         private void UiSubcribe()
         {
             RaceMovement.ObserveEveryValueChanged(x => x.CurrentSpeed)
-                .Select(x => (int) x)
                 .Subscribe(x =>
                 {
                     _gameUI.SpeedText.DOCounter(_previousValue, x, 0.1f).SetEase(Ease.Linear);

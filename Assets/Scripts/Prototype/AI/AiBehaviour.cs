@@ -6,6 +6,7 @@ using NascarSurvival;
 using NascarSurvival.Collectable;
 using UniRx;
 using UnityEngine;
+using Object = System.Object;
 using Random = UnityEngine.Random;
 
 
@@ -30,14 +31,8 @@ namespace Prototype.AI
 
         private void CreateSequence()
         {
-            Observable.Interval(TimeSpan.FromSeconds(_enemySettings.TimeToSwitchBehaviour))
-                .DoOnSubscribe(() => _aiMovementController.Movement = new Vector2(0, _enemySettings.MaxPowerOfCar / 100f))
-                .Subscribe(_ =>
-                {
-                    CheckPowerChances();
-                })
-                .AddTo(_disposable);
-
+            _aiMovementController.Movement = Vector2.up;
+            
             _collectableSpawner.ObserveEveryValueChanged(bonus => bonus.AccelerateBonusList.Count)
                 .Subscribe(_ => ChooseBonusPath())
                 .AddTo(_disposable);
@@ -59,16 +54,14 @@ namespace Prototype.AI
             
             if (TakeRandomBool(_enemySettings.ChanceToPickUpBonus))
             {
-                // Observable.EveryUpdate()
-                //     .TakeWhile(_ => (_enemySettings.transform.position.x - nearestBonus.transform.position.x) > 0.1f)
-                //     .Subscribe(_ => )
+                _enemySettings.transform.forward = direction;
                 
-                // _aiMovementController.Movement += new Vector2(direction.x, _enemySettings.ValueToIncrease / 100f);
+                //_aiMovementController.Movement = new Vector2(direction.x, direction.z).normalized;
                 // Debug.Log($"Speed increase {_aiMovementController.Movement.y}");
             }
             else
             {
-                Debug.Log($"<color=black>Nearest Bonus Ignored{nearestBonus}", nearestBonus);
+                Debug.Log($"<color=black>Nearest Bonus Ignored{nearestBonus}</color>", nearestBonus);
                 // _aiMovementController.Movement -= new Vector2(0, _enemySettings.ValueToIncrease / 100f);
                 // Debug.Log($"Speed decrease {_aiMovementController.Movement.y}");
             }
@@ -84,12 +77,17 @@ namespace Prototype.AI
             collectableSpawnerAccelerateBonusList.ForEach(x =>
             {
                 var distance = Vector3.Distance(x.transform.position, _enemySettings.transform.position);
-                if (distance < firstBonusDistance && _enemySettings.transform.position.z < x.transform.position.z)
+                if (distance < firstBonusDistance)
                 {
                     bonus = x;
                 }
             });
 
+            if (_enemySettings.transform.position.z > bonus.transform.position.z)
+            {
+                return null;
+            }
+            
             return bonus;
         }
 
