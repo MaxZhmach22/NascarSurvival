@@ -11,11 +11,13 @@ namespace NascarSurvival.Collectable
     [RequireComponent(typeof(Rigidbody), typeof(SphereCollider))]
     public class AccelerateBonus : Collectable
     {
+        public bool IsInteracted { get; private set; }
+        
         private Collider _collider;
         private Rigidbody _rigidbody;
         private GameStateHandler _gameStateHandler;
 
-        
+
         [Inject]
         private void Init(GameStateHandler gameStateHandler)
         {
@@ -43,6 +45,7 @@ namespace NascarSurvival.Collectable
         public override void Request(IInteractable interactable, IInitializer initializer)
         {
             interactable.Visit(this, initializer.RaceMovement);
+            IsInteracted = true;
             gameObject.SetActive(false);
         }
         

@@ -34,8 +34,7 @@ namespace NascarSurvival
             _finisZone = finisZone;
 
             AccelerationSequence();
-
-
+            
             Observable.EveryUpdate()
                 .Where(_ => Input.GetKeyDown(KeyCode.A))
                 .Subscribe(_ => BonusSpeedEffect(5, 5, 5))
@@ -50,7 +49,7 @@ namespace NascarSurvival
                 .DoOnTerminate(() =>
                 {
                     ConstantMovementSequence();
-                    Debug.Log("<color=red>Accelerated</color>");
+                    // Debug.Log("<color=red>Accelerated</color>");
                 })
                 .Subscribe(_ => StartAccelerationMovement())
                 .AddTo(_disposable);
@@ -82,7 +81,7 @@ namespace NascarSurvival
                 .TakeWhile(_ => _currentSpeed > 0)
                 .DoOnTerminate(() =>
                 {
-                    Debug.Log("<color=red>Stopped!</color>");
+                    // Debug.Log("<color=red>Stopped!</color>");
                 })
                 .Subscribe(_ => StartDecelerationMovement())
                 .AddTo(_disposable);
@@ -125,7 +124,7 @@ namespace NascarSurvival
                 .OnStart(() =>
                 {
                     _bonusSpeedEffect = true;
-                    Debug.Log("Start accelerate");
+                    // Debug.Log("Start accelerate");
                 })
                 .OnComplete(() => Debug.Log(_currentSpeed));
             
@@ -133,7 +132,7 @@ namespace NascarSurvival
             
             DOTween.To(() => _currentSpeed, x => _currentSpeed = x, startSpeed, acceletartionTime)
                 .SetEase(Ease.Linear)
-                .OnStart(() => Debug.Log("Start deccelerate"))
+                // .OnStart(() => Debug.Log("Start deccelerate"))
                 .OnComplete(() =>
                 {
                     _bonusSpeedEffect = false;
