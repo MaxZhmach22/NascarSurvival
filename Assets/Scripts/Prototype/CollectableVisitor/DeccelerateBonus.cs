@@ -1,5 +1,3 @@
-using System;
-using Cysharp.Threading.Tasks;
 using Dron;
 using UniRx;
 using UniRx.Triggers;
@@ -7,10 +5,10 @@ using UnityEngine;
 using Zenject;
 
 namespace NascarSurvival.Collectable
-{
+{   
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Rigidbody), typeof(SphereCollider))]
-    public class AccelerateBonus : Collectable
+    public class DeccelerateBonus : Collectable
     {
         public bool IsInteracted { get; private set; }
         
@@ -53,12 +51,10 @@ namespace NascarSurvival.Collectable
 
             if(initializer is EnemyInitializer) return;
             
-            GameMessageText(_gameUI, "Speed increased!");
+            GameMessageText(_gameUI, "Speed decreased!");
         }
-
-       
-
-        public class Factory : PlaceholderFactory<AccelerateBonus>
+        
+        public class Factory : PlaceholderFactory<DeccelerateBonus>
         {
             
         }

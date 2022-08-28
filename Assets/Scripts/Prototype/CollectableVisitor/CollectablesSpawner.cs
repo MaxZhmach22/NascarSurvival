@@ -13,6 +13,8 @@ namespace NascarSurvival.Collectable
         public List<AccelerateBonus> AccelerateBonusList = new List<AccelerateBonus>();
         
         private readonly AccelerateBonus.Factory _accelerationBonusFactory;
+        private readonly DeccelerateBonus.Factory _deccelerationBonusFactory;
+        private readonly BombBonus.Factory _bombBonusFactory;
         private readonly FinishZone _finishZone;
         private readonly CollectableSpawnSettings _collectableSpawnSettings;
         private readonly GameStateHandler _gameStateHandler;
@@ -21,16 +23,33 @@ namespace NascarSurvival.Collectable
 
         public CollectablesSpawner(AccelerateBonus.Factory accelerationBonusFactory, 
             FinishZone finishZone, 
-            CollectableSpawnSettings collectableSpawnSettings, GameStateHandler gameStateHandler)
+            CollectableSpawnSettings collectableSpawnSettings, GameStateHandler gameStateHandler, 
+            DeccelerateBonus.Factory deccelerationBonusFactory, 
+            BombBonus.Factory bombBonusFactory)
         {
             _accelerationBonusFactory = accelerationBonusFactory;
             _collectableSpawnSettings = collectableSpawnSettings;
             _gameStateHandler = gameStateHandler;
+            _deccelerationBonusFactory = deccelerationBonusFactory;
+            _bombBonusFactory = bombBonusFactory;
             _finishZone = finishZone;
             _bonusesParent = new GameObject("Bonuses Parent").transform;
             
-            CreateSequence();
+            AccelerateBonusSpawnSequence();
+            BombBonusSpawnSequence();
             BonusListObservable();
+        }
+
+        private void BombBonusSpawnSequence()
+        {
+            var timer = TakeRandomTime(_collectableSpawnSettings.BombBonusMixTimeToSpwan, _collectableSpawnSettings.BombBonusMaxTimeToSpwan);
+
+            Observable.Timer(TimeSpan.FromSeconds(timer))
+                .Where(_ => _gameStateHandler.CurrentGameState == GameStates.Start)
+                .DoOnTerminate(() => BombBonusSpawnSequence())
+                // .DoOnSubscribe(() => Debug.Log($"New timer value {timer}"))
+                .Subscribe(_ => CreateBombBonus())
+                .AddTo(_disposable);
         }
 
         private void BonusListObservable()
@@ -41,13 +60,13 @@ namespace NascarSurvival.Collectable
                 .AddTo(_disposable);
         }
 
-        private void CreateSequence()
+        private void AccelerateBonusSpawnSequence()
         {
-            var timer = TakeRandomTime();
+            var timer = TakeRandomTime(_collectableSpawnSettings.AccelerateBonusMinTimeToSpwan, _collectableSpawnSettings.AccelerateBonusMaxTimeToSpwan);
 
             Observable.Timer(TimeSpan.FromSeconds(timer))
                 .Where(_ => _gameStateHandler.CurrentGameState == GameStates.Start)
-                .DoOnTerminate(() => CreateSequence())
+                .DoOnTerminate(() => AccelerateBonusSpawnSequence())
                 // .DoOnSubscribe(() => Debug.Log($"New timer value {timer}"))
                 .Subscribe(_ => CreateAccelerationBonus())
                 .AddTo(_disposable);
@@ -63,10 +82,21 @@ namespace NascarSurvival.Collectable
             AccelerateBonusList.Add(bonus);
             // Debug.Log($"<color=cyan>Instanciated{bonus}</color>",bonus);
         }
-
-        private float TakeRandomTime()
+        
+        
+        private void CreateBombBonus()
         {
-            return Random.Range(_collectableSpawnSettings.MinTimeToSpwan, _collectableSpawnSettings.MaxTimeToSpwan);
+            var bonus = _bombBonusFactory.Create();
+            bonus.transform.SetParent(_bonusesParent);
+            var pos = Vector3.Lerp(_collectableSpawnSettings.transform.position, _finishZone.transform.position, Random.Range(0.1f, 0.8f));
+            pos.Set(Random.Range(-4,4), 5, pos.z);
+            bonus.gameObject.transform.position = pos;
+            // Debug.Log($"<color=cyan>Instanciated{bonus}</color>",bonus);
+        }
+
+        private float TakeRandomTime(float minValue,float maxValue)
+        {
+            return Random.Range(minValue, maxValue);
         }
 
         public void Dispose()

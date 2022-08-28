@@ -14,6 +14,7 @@ namespace NascarSurvival
     public class HeroInitializer : MonoBehaviour, IInitializer
     {
         public RaceMovement RaceMovement { get; private set; }
+        public string Name => gameObject.name;
         private HeroSettings _heroSettings;
         private IMoveController _dynamicJoystick;
         private GameStateHandler _gameStateHandler;
@@ -43,8 +44,6 @@ namespace NascarSurvival
         {
             RaceMovement = new RaceMovement(_dynamicJoystick, _gameStateHandler, _heroSettings, _finishZone);
             
-
-            CreateSequence();
             UiSubcribe();
         }
 
@@ -57,35 +56,50 @@ namespace NascarSurvival
                     _previousValue = (int)x;
                 })
                 .AddTo(this);
+            
+            CreateSequence();
+        }
 
+        private void CounterUi()
+        {
             RaceMovement.ObserveEveryValueChanged(x => x.StartCounter)
+                .Skip(1)
                 .Select(x => (int) x)
-                .Subscribe( async counter =>
+                .Subscribe(async counter =>
                 {
                     if (counter > 0)
                     {
-                        _gameUI.StartCounter.DOCounter(counter, counter - 1, 0.3f).SetEase(Ease.Linear);
+                        _gameUI.GameMessages.DOCounter(counter, counter - 1, 0.3f).SetEase(Ease.Linear);
                     }
                     else
                     {
-                        _gameUI.StartCounter.text = "GO!";
+                        _gameUI.GameMessages.text = "GO!";
                         await UniTask.Delay(TimeSpan.FromSeconds(1),
                             cancellationToken: this.GetCancellationTokenOnDestroy());
-                        _gameUI.StartCounter.gameObject.SetActive(false);
+                        _gameUI.GameMessages.gameObject.SetActive(false);
                     }
-                    
                 })
                 .AddTo(this);
-
-
         }
 
         private void CreateSequence()
         {
+            var startFontSize = _gameUI.GameMessages.fontSize;
+            
             Observable.EveryUpdate()
                 .Where(_ => Input.GetMouseButtonDown(0))
                 .Take(1)
-                .DoOnTerminate(() => Debug.Log("Game is Started!"))
+                .DoOnSubscribe(() =>
+                {
+                    _gameUI.GameMessages.fontSize /= 2;
+                    _gameUI.GameMessages.text = "Tap to start!";
+                })
+                .DoOnTerminate(() =>
+                {
+                    _gameUI.GameMessages.text = "";
+                    _gameUI.GameMessages.fontSize = startFontSize;
+                    CounterUi();
+                })
                 .Subscribe(_ => _gameStateHandler.ChangeState(GameStates.Start))
                 .AddTo(this);
         }

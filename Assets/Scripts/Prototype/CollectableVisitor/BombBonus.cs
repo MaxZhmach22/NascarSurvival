@@ -1,5 +1,3 @@
-using System;
-using Cysharp.Threading.Tasks;
 using Dron;
 using UniRx;
 using UniRx.Triggers;
@@ -10,7 +8,7 @@ namespace NascarSurvival.Collectable
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Rigidbody), typeof(SphereCollider))]
-    public class AccelerateBonus : Collectable
+    public class BombBonus : Collectable
     {
         public bool IsInteracted { get; private set; }
         
@@ -51,14 +49,19 @@ namespace NascarSurvival.Collectable
             IsInteracted = true;
             gameObject.SetActive(false);
 
-            if(initializer is EnemyInitializer) return;
+            if (initializer is EnemyInitializer)
+            {
+                GameMessageText(_gameUI, $"{initializer.Name} BOOMED!");
+            }
+            else
+            {
+                GameMessageText(_gameUI, $"BOOM!");
+            }
             
-            GameMessageText(_gameUI, "Speed increased!");
+            
         }
-
-       
-
-        public class Factory : PlaceholderFactory<AccelerateBonus>
+        
+        public class Factory : PlaceholderFactory<BombBonus>
         {
             
         }

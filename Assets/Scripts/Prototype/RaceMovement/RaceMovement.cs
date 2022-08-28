@@ -1,9 +1,11 @@
 using System;
+using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UniRx;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 
 namespace NascarSurvival
@@ -30,6 +32,7 @@ namespace NascarSurvival
         private float _deadZone = 0.03f;
         private float _previousCurrentYAxes;
         private bool _isDotweening;
+        private bool _isBoomed;
 
 
         public RaceMovement(IMoveController movingController, 
@@ -120,6 +123,8 @@ namespace NascarSurvival
         
         private void ConstantForwardMovement()
         {
+            if (_isBoomed)  return;
+
             var forwardControllerVector = Vector3.zero;
             var rotation = Vector3.zero;
             
@@ -207,6 +212,28 @@ namespace NascarSurvival
         {
             _cancellationToken.Cancel();
             _disposable.Clear();
+        }
+
+        public async void BoomBonus(Vector3 position)
+        {
+            _isBoomed = true;
+            var startPosition = _objectSettings.transform.position;
+            var startRotation = _objectSettings.transform.rotation;
+            var colliders = _objectSettings.GetComponentsInChildren<Collider>().ToList();
+            var rigidBody = _objectSettings.GetComponentInChildren<Rigidbody>();
+            
+            rigidBody.isKinematic = false;
+            colliders.ForEach(colliders => colliders.enabled = false);
+            rigidBody.AddExplosionForce(20f, position, 5f, 10f,ForceMode.VelocityChange);
+            rigidBody.AddTorque(new Vector3(Random.Range(0,100),0, Random.Range(0,100)), ForceMode.VelocityChange);
+
+            await UniTask.Delay(TimeSpan.FromSeconds(3f), cancellationToken: _cancellationToken.Token);
+
+            rigidBody.isKinematic = true;
+            colliders.ForEach(colliders => colliders.enabled = true);
+            _objectSettings.transform.position = startPosition;
+            _objectSettings.transform.rotation = startRotation;
+            _isBoomed = false;
         }
     }
 }

@@ -15,11 +15,12 @@ namespace NascarSurvival
         [field: Foldout("References")] [field: SerializeField] public DefeatScreen DefeatScreen { get; private set; }
         [field: Foldout("References")] [field: SerializeField] public GameScreen GameScreen { get; private set; }
         [field: Foldout("References")] [field: SerializeField] public TMP_Text SpeedText { get; private set; }
-        [field: Foldout("References")] [field: SerializeField] public TMP_Text StartCounter { get; private set; }
+        [field: Foldout("References")] [field: SerializeField] public TMP_Text GameMessages { get; private set; }
 
         private List<GameObject> _screens = new List<GameObject>();
         private GameStateHandler _gameStateHandler;
-        
+        private SoundHandler _soundHandler;
+
         [Inject]
         private void Init(GameStateHandler gameStateHandler)
         {
@@ -28,6 +29,8 @@ namespace NascarSurvival
         
         private void Start()
         {
+            FindSoundHandler();
+            
             _screens.Add(VictoryScreen.gameObject);
             _screens.Add(DefeatScreen.gameObject);
             _screens.Add(GameScreen.gameObject);
@@ -60,6 +63,15 @@ namespace NascarSurvival
         private void DeactivateScreen()
         {
             _screens.ForEach(x => x.gameObject.SetActive(false));
+        }
+        
+        private void FindSoundHandler()
+        {
+            _soundHandler = FindObjectOfType<SoundHandler>();
+            if (_soundHandler == null)
+            {
+                _soundHandler = new GameObject("SoundHandler").AddComponent<SoundHandler>();
+            }
         }
 
         private void OnDestroy()

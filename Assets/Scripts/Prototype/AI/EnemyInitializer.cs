@@ -11,6 +11,7 @@ namespace NascarSurvival
     public class EnemyInitializer : MonoBehaviour, IInitializer
     {
         public RaceMovement RaceMovement { get; private set; }
+        public string Name => gameObject.name;
         private EnemySettings _enemySettings;
         private AIMovementController _aiMoveController;
         private CollectablesSpawner _collectablesSpawner;
