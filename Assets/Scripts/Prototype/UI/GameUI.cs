@@ -15,6 +15,7 @@ namespace NascarSurvival
         [field: Foldout("References")] [field: SerializeField] public DefeatScreen DefeatScreen { get; private set; }
         [field: Foldout("References")] [field: SerializeField] public GameScreen GameScreen { get; private set; }
         [field: Foldout("References")] [field: SerializeField] public TMP_Text SpeedText { get; private set; }
+        [field: Foldout("References")] [field: SerializeField] public TMP_Text StartCounter { get; private set; }
 
         private List<GameObject> _screens = new List<GameObject>();
         private GameStateHandler _gameStateHandler;

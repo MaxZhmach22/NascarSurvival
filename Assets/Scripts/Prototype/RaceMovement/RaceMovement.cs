@@ -11,8 +11,9 @@ namespace NascarSurvival
     public class RaceMovement : IDisposable
     {
         public int CurrentSpeed => _lengthOfTheVector;
+        public float StartCounter => _startCounter;
 
-        private float _constantForwardSpeed;
+        private float _startCounter;
         private float _currentSpeed;
       
         private int _lengthOfTheVector;
@@ -25,6 +26,10 @@ namespace NascarSurvival
         private readonly ObjectSettings _objectSettings;
         private readonly FinishZone _finisZone;
         private float _startSpeedScalar;
+        private bool _isPlayerControl;
+        private float _deadZone = 0.1f;
+        private float _previousCurrentXAxes;
+        private bool _isDotweening;
 
 
         public RaceMovement(IMoveController movingController, 
@@ -37,6 +42,8 @@ namespace NascarSurvival
             _objectSettings = objectSettings;
             _finisZone = finisZone;
             _currentSpeed = _objectSettings.SensitiveXaxes;
+            _startCounter = 4;
+            _isPlayerControl = _movingController is DynamicJoystick;
             
             AccelerationSequence();
             
@@ -48,28 +55,21 @@ namespace NascarSurvival
 
         private void AccelerationSequence()
         {
-            DOTween.To(() => _constantForwardSpeed, x => _constantForwardSpeed = x, _objectSettings.StartSpeedToAccelerate,
-                    _objectSettings.StartAccelerationTime)
-                .SetEase(Ease.Linear)
-                .OnUpdate(() => StartAccelerationMovement())
-                .OnComplete(() =>
+            Observable.EveryUpdate()
+                .Where(_ => Input.GetMouseButtonDown(0))
+                .Take(1)
+                .Subscribe(_ =>
                 {
-                    Debug.Log(_constantForwardSpeed);
-                    ConstantMovementSequence();
-                });
-                
-                
-            //     
-            // Observable.EveryUpdate()
-            //     .Where(_ => _gameStateHandler.CurrentGameState == GameStates.Start)
-            //     .TakeWhile(_ => _currentSpeed < _objectSettings.StartSpeedToAccelerate)
-            //     .DoOnTerminate(() =>
-            //     {
-            //         ConstantMovementSequence();
-            //         // Debug.Log("<color=red>Accelerated</color>");
-            //     })
-            //     .Subscribe(_ => StartAccelerationMovement())
-            //     .AddTo(_disposable);
+                    DOTween.To(() => _startCounter, x => _startCounter = x, 0,
+                            3)
+                        .SetEase(Ease.Linear)
+                        .OnUpdate(() => StartAccelerationMovement())
+                        .OnComplete(() =>
+                        {
+                            ConstantMovementSequence();
+                        });
+                })
+                .AddTo(_disposable);
         }
         
         private void ConstantMovementSequence()
@@ -95,7 +95,7 @@ namespace NascarSurvival
         private void DecelerationMovement()
         {
             Observable.EveryUpdate()
-                .TakeWhile(_ => _constantForwardSpeed > 0)
+                .TakeWhile(_ => _startCounter > 0)
                 .DoOnTerminate(() =>
                 {
                     // Debug.Log("<color=red>Stopped!</color>");
@@ -113,9 +113,9 @@ namespace NascarSurvival
         
         private void StartDecelerationMovement()
         {
-            _constantForwardSpeed -= Time.deltaTime * _objectSettings.StartAccelerationTime;
-            _constantForwardSpeed = Mathf.Clamp(_constantForwardSpeed, 0, _objectSettings.StartSpeedToAccelerate);
-            _objectSettings.transform.position +=_objectSettings.transform.forward + Vector3.forward * _constantForwardSpeed * Time.deltaTime;
+            _startCounter -= Time.deltaTime * _objectSettings.StartAccelerationTime;
+            _startCounter = Mathf.Clamp(_startCounter, 0, _objectSettings.StartSpeedToAccelerate);
+            _objectSettings.transform.position +=_objectSettings.transform.forward + Vector3.forward * _startCounter * Time.deltaTime;
         }
         
         private void ConstantForwardMovement()
@@ -123,18 +123,50 @@ namespace NascarSurvival
             var forwardControllerVector = Vector3.zero;
             var rotation = Vector3.zero;
             
-            if (_movingController is DynamicJoystick)
+            if (_isPlayerControl)
             {
-                forwardControllerVector =
-                    new Vector3(0, 0, _movingController.Movement.y) * _currentSpeed * Time.deltaTime;
-                rotation = new Vector3(_movingController.Movement.x, 0, 0) * _objectSettings.SensitiveYaxes *
-                           Time.deltaTime;
-                _objectSettings.transform.position += rotation + forwardControllerVector * _startSpeedScalar;
+                var currentXAxes = _movingController.Movement.y * _objectSettings.SensitiveYaxes;
+                
+                if (Mathf.Abs(currentXAxes - _previousCurrentXAxes) > _deadZone)
+                {
+                    if(_isDotweening) return;
+                    
+                    DOTween.To(() => _previousCurrentXAxes, x => _previousCurrentXAxes = x, currentXAxes, 0.5f)
+                        .SetEase(Ease.Linear)
+                        .SetUpdate(UpdateType.Fixed)
+                        .OnStart(() => _isDotweening = true)
+                        .OnUpdate(() =>
+                        {
+                            forwardControllerVector =
+                                new Vector3(0, 0, 1f + _previousCurrentXAxes) * _currentSpeed * Time.deltaTime;
+                            rotation = new Vector3(_movingController.Movement.x, 0, 0) *
+                                       _objectSettings.SensitiveYaxes *
+                                       Time.deltaTime;
+                            _objectSettings.transform.position += rotation + forwardControllerVector;
+                        })
+                        .OnComplete(() =>
+                        {
+                            _isDotweening = false;
+                            _previousCurrentXAxes = currentXAxes;
+                        });
+                }
+                else
+                {
+                    if(_isDotweening) return;
+                    
+                    forwardControllerVector =
+                        new Vector3(0, 0, 1f + currentXAxes) * _currentSpeed * Time.deltaTime;
+                    rotation = new Vector3(_movingController.Movement.x, 0, 0) * _objectSettings.SensitiveYaxes *
+                               Time.deltaTime;
+                    _objectSettings.transform.position += rotation + forwardControllerVector;
+                    _previousCurrentXAxes = currentXAxes;
+                }
             }
             else
             {
+                _objectSettings.transform.forward = new Vector3(_objectSettings.transform.forward.x, 0, _objectSettings.transform.forward.z);
                 forwardControllerVector = _objectSettings.transform.forward * _currentSpeed * Time.deltaTime;
-                _objectSettings.transform.position += forwardControllerVector * _startSpeedScalar;
+                _objectSettings.transform.position += forwardControllerVector;
             }
   
             var clampBorders = Mathf.Clamp(_objectSettings.transform.position.x, -5, 5);
@@ -146,8 +178,8 @@ namespace NascarSurvival
 
         public async void BonusSpeedEffect(float bonusToSpeed, float acceletartionTime, float activeTime)
         {
-            var startSpeed = _constantForwardSpeed;
-            var allSpeed = _constantForwardSpeed + bonusToSpeed;
+            var startSpeed = _currentSpeed;
+            var allSpeed = _currentSpeed + bonusToSpeed;
             
             DOTween.To(() => _currentSpeed, x => _currentSpeed = x, allSpeed, acceletartionTime)
                 .SetEase(Ease.Linear)

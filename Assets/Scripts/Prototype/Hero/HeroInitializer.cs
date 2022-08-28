@@ -1,3 +1,5 @@
+using System;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using NascarSurvival.Collectable;
 using UniRx;
@@ -55,6 +57,27 @@ namespace NascarSurvival
                     _previousValue = x;
                 })
                 .AddTo(this);
+
+            RaceMovement.ObserveEveryValueChanged(x => x.StartCounter)
+                .Select(x => (int) x)
+                .Subscribe( async counter =>
+                {
+                    if (counter > 0)
+                    {
+                        _gameUI.StartCounter.DOCounter(counter, counter - 1, 0.3f).SetEase(Ease.Linear);
+                    }
+                    else
+                    {
+                        _gameUI.StartCounter.text = "GO!";
+                        await UniTask.Delay(TimeSpan.FromSeconds(1),
+                            cancellationToken: this.GetCancellationTokenOnDestroy());
+                        _gameUI.StartCounter.gameObject.SetActive(false);
+                    }
+                    
+                })
+                .AddTo(this);
+
+
         }
 
         private void CreateSequence()
