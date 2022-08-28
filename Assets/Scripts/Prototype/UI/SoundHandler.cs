@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Zenject;
 
 namespace NascarSurvival
 {
@@ -60,6 +61,20 @@ namespace NascarSurvival
             
             _isMutedSound = !_isMutedSound;
             return _isMutedSound;
+        }
+
+        public void StopAllSounds()
+        {
+            _sounds.ForEach(sound =>
+            {
+                if(!sound.Name.Contains("MainTheme"))
+                    sound.AudioSource.Stop();
+            });
+        }
+        
+        public class Factory : PlaceholderFactory<SoundHandler>
+        {
+            
         }
     }
 }

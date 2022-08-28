@@ -4,6 +4,7 @@ using UniRx.Triggers;
 using UnityEngine;
 using Zenject;
 
+
 namespace NascarSurvival.Collectable
 {   
     [DisallowMultipleComponent]
@@ -48,9 +49,10 @@ namespace NascarSurvival.Collectable
             interactable.Visit(this, initializer.RaceMovement);
             IsInteracted = true;
             gameObject.SetActive(false);
+            
 
             if(initializer is EnemyInitializer) return;
-            
+            _gameUI.SoundHandler.Play("PickUpBonus2");
             GameMessageText(_gameUI, "Speed decreased!");
         }
         

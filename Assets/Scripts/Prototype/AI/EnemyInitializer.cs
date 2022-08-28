@@ -18,17 +18,20 @@ namespace NascarSurvival
         private GameStateHandler _gameStateHandler;
         private AiBehaviour _aiBehaviour;
         private FinishZone _finishZone;
+        private GameUI _gameUI;
         
         [Inject]
         private void SetReferences(
             GameStateHandler gameStateHandler,
             FinishZone finishZone,
-            CollectablesSpawner collectablesSpawner
+            CollectablesSpawner collectablesSpawner,
+            GameUI gameUI
         )
         {
             _gameStateHandler = gameStateHandler;
             _finishZone = finishZone;
             _collectablesSpawner = collectablesSpawner;
+            _gameUI = gameUI;
         }
 
         private void Awake()
@@ -40,16 +43,12 @@ namespace NascarSurvival
         {
             _aiMoveController = new AIMovementController();
             _aiBehaviour = new AiBehaviour(_enemySettings, _aiMoveController, _collectablesSpawner);
-            RaceMovement = new RaceMovement(_aiMoveController, _gameStateHandler, _enemySettings, _finishZone);
+            RaceMovement = new RaceMovement(_aiMoveController, _gameStateHandler, _enemySettings, _finishZone, _gameUI);
         }
         
-        private void CreateSequence()
-        {
-          
-        }
-
         private void OnDestroy()
         {
+            _gameUI.SoundHandler.StopAllSounds();
             _aiBehaviour.Dispose();
             RaceMovement.Dispose();
         }

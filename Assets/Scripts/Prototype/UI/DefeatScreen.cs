@@ -1,3 +1,4 @@
+using NaughtyAttributes;
 using UniRx;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -9,13 +10,6 @@ namespace NascarSurvival
 {
     public class DefeatScreen : MonoBehaviour
     {
-        [SerializeField] private Button _restartButton;
-        
-        private void Awake()
-        {
-            _restartButton.OnClickAsObservable()
-                .Subscribe(_ => new LoadSceneHandler().ReloadCurrentScene())
-                .AddTo(this);
-        }
+        [field: BoxGroup("References")] [field:SerializeField] public Button RestartButton { get; private set; }
     }
 }

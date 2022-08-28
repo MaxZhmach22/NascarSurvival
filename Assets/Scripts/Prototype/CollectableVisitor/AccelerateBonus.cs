@@ -50,9 +50,11 @@ namespace NascarSurvival.Collectable
             interactable.Visit(this, initializer.RaceMovement);
             IsInteracted = true;
             gameObject.SetActive(false);
-
+            
+            
             if(initializer is EnemyInitializer) return;
             
+            _gameUI.SoundHandler.Play("PickUpBonus1");
             GameMessageText(_gameUI, "Speed increased!");
         }
 

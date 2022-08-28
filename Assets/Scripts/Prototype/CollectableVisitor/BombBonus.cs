@@ -48,7 +48,7 @@ namespace NascarSurvival.Collectable
             interactable.Visit(this, initializer.RaceMovement);
             IsInteracted = true;
             gameObject.SetActive(false);
-
+            _gameUI.SoundHandler.Play("ExplosionBomb");
             if (initializer is EnemyInitializer)
             {
                 GameMessageText(_gameUI, $"{initializer.Name} BOOMED!");

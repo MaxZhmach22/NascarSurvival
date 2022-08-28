@@ -4,6 +4,7 @@ using NaughtyAttributes;
 using TMPro;
 using UniRx;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Zenject;
 
@@ -16,15 +17,18 @@ namespace NascarSurvival
         [field: Foldout("References")] [field: SerializeField] public GameScreen GameScreen { get; private set; }
         [field: Foldout("References")] [field: SerializeField] public TMP_Text SpeedText { get; private set; }
         [field: Foldout("References")] [field: SerializeField] public TMP_Text GameMessages { get; private set; }
+        [field: Foldout("References")] [field: SerializeField] public TMP_Text TextLevel { get; private set; }
 
         private List<GameObject> _screens = new List<GameObject>();
         private GameStateHandler _gameStateHandler;
-        private SoundHandler _soundHandler;
+        public SoundHandler SoundHandler { get; private set; }
+        public SoundHandler.Factory _soundFactory;
 
         [Inject]
-        private void Init(GameStateHandler gameStateHandler)
+        private void Init(GameStateHandler gameStateHandler, SoundHandler.Factory soundFactory)
         {
             _gameStateHandler = gameStateHandler;
+            _soundFactory = soundFactory;
         }
         
         private void Start()
@@ -36,6 +40,45 @@ namespace NascarSurvival
             _screens.Add(GameScreen.gameObject);
 
             _gameStateHandler.OnChangeState += OnChangeState;
+
+            TextLevel.text = SceneManager.GetActiveScene().name;
+
+            BindButtons();
+        }
+
+        private void BindButtons()
+        {
+            GameScreen.RestartButton.OnClickAsObservable()
+                .Subscribe(_ =>
+                {
+                    SoundHandler.Play("ClickUi2");
+                    new LoadSceneHandler().ReloadCurrentScene();
+                })
+                .AddTo(this);
+            
+            VictoryScreen.NextLevelButton.OnClickAsObservable()
+                .Subscribe(_ =>
+                {
+                    SoundHandler.Play("ClickUi1");
+                    new LoadSceneHandler().LoadNextScene();
+                })
+                .AddTo(this);
+            
+            VictoryScreen.RestartButton.OnClickAsObservable()
+                .Subscribe(_ =>
+                {
+                    SoundHandler.Play("ClickUi2");
+                    new LoadSceneHandler().ReloadCurrentScene();
+                })
+                .AddTo(this);
+            
+            DefeatScreen.RestartButton.OnClickAsObservable()
+                .Subscribe(_ =>
+                {
+                    SoundHandler.Play("ClickUi2");
+                    new LoadSceneHandler().ReloadCurrentScene();
+                })
+                .AddTo(this);
         }
 
         private void OnChangeState(GameStates state)
@@ -67,10 +110,10 @@ namespace NascarSurvival
         
         private void FindSoundHandler()
         {
-            _soundHandler = FindObjectOfType<SoundHandler>();
-            if (_soundHandler == null)
+            SoundHandler = FindObjectOfType<SoundHandler>();
+            if (SoundHandler == null)
             {
-                _soundHandler = new GameObject("SoundHandler").AddComponent<SoundHandler>();
+                SoundHandler = _soundFactory.Create();
             }
         }
 

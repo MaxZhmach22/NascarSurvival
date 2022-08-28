@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -27,29 +28,34 @@ namespace NascarSurvival
         private readonly CancellationTokenSource _cancellationToken = new CancellationTokenSource();
         private readonly ObjectSettings _objectSettings;
         private readonly FinishZone _finisZone;
+        private readonly GameUI _gameUI;
         private float _startSpeedScalar;
         private bool _isPlayerControl;
         private float _deadZone = 0.03f;
         private float _previousCurrentYAxes;
         private bool _isDotweening;
         private bool _isBoomed;
+        private Transform _model;
 
 
         public RaceMovement(IMoveController movingController, 
             GameStateHandler gameStateHandler, 
             ObjectSettings objectSettings, 
-            FinishZone finisZone)
+            FinishZone finisZone, 
+            GameUI gameUI)
         {
             _movingController = movingController;
             _gameStateHandler = gameStateHandler;
             _objectSettings = objectSettings;
             _finisZone = finisZone;
+            _gameUI = gameUI;
             _currentSpeed = _objectSettings.StartSpeed;
             _startCounter = 4;
             _isPlayerControl = _movingController is DynamicJoystick;
+            _model = _objectSettings.GetComponentsInChildren<Transform>().First(x => x.name.Contains("Model"));
             
             AccelerationSequence();
-            
+
             Observable.EveryUpdate()
                 .Where(_ => Input.GetKeyDown(KeyCode.A))
                 .Subscribe(_ => BonusSpeedEffect(5, 5, 5))
@@ -79,10 +85,14 @@ namespace NascarSurvival
         {
             Observable.EveryFixedUpdate()
                 .TakeWhile(_ => _objectSettings.transform.position.z < _finisZone.transform.position.z)
+                .DoOnSubscribe(() => _gameUI.SoundHandler.Play("Engine01"))
                 .DoOnTerminate(() =>
                 {
-                    EndGame();
-                    
+                    Observable.EveryFixedUpdate()
+                        .TakeWhile(_ => _currentSpeed > 0)
+                        .DoOnTerminate(() => EndGame())
+                        .Subscribe(_ => StartDecelerationMovement())
+                        .AddTo(_disposable);
                 })
                 .Subscribe(_ => ConstantForwardMovement())
                 .AddTo(_disposable);
@@ -116,9 +126,9 @@ namespace NascarSurvival
         
         private void StartDecelerationMovement()
         {
-            _startCounter -= Time.deltaTime * _objectSettings.StartAccelerationTime;
-            _startCounter = Mathf.Clamp(_startCounter, 0, _objectSettings.StartSpeed);
-            _objectSettings.transform.position +=_objectSettings.transform.forward + Vector3.forward * _startCounter * Time.deltaTime;
+            _currentSpeed -= Time.deltaTime * _objectSettings.StartAccelerationTime;
+            _currentSpeed = Mathf.Clamp(_currentSpeed, 0, _objectSettings.StartSpeed);
+            _objectSettings.transform.position +=_objectSettings.transform.forward + Vector3.forward * _currentSpeed * Time.deltaTime;
         }
         
         private void ConstantForwardMovement()
@@ -149,6 +159,7 @@ namespace NascarSurvival
                                        Time.deltaTime;
                             _objectSettings.transform.position += rotation + forwardControllerVector;
                             _lengthOfTheVector = forwardControllerVector.z * 1000f;
+                            _model.transform.rotation = Quaternion.Euler(new Vector3(0,rotation.x * 800,0));
                         })
                         .OnComplete(() =>
                         {
@@ -166,7 +177,11 @@ namespace NascarSurvival
                                Time.deltaTime;
                     _objectSettings.transform.position += rotation + forwardControllerVector;
                     _previousCurrentYAxes = currentXAxes;
+                    _model.transform.rotation = Quaternion.Euler(new Vector3(0,rotation.x * 800,0));
                 }
+
+                
+
             }
             else
             {

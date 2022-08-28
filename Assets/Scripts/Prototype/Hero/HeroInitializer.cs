@@ -42,7 +42,7 @@ namespace NascarSurvival
         
         private void Start()
         {
-            RaceMovement = new RaceMovement(_dynamicJoystick, _gameStateHandler, _heroSettings, _finishZone);
+            RaceMovement = new RaceMovement(_dynamicJoystick, _gameStateHandler, _heroSettings, _finishZone, _gameUI);
             
             UiSubcribe();
         }
@@ -69,7 +69,8 @@ namespace NascarSurvival
                 {
                     if (counter > 0)
                     {
-                        _gameUI.GameMessages.DOCounter(counter, counter - 1, 0.3f).SetEase(Ease.Linear);
+                        _gameUI.GameMessages.DOCounter(counter, counter - 1, 0.3f)
+                            .SetEase(Ease.Linear);
                     }
                     else
                     {
@@ -100,12 +101,17 @@ namespace NascarSurvival
                     _gameUI.GameMessages.fontSize = startFontSize;
                     CounterUi();
                 })
-                .Subscribe(_ => _gameStateHandler.ChangeState(GameStates.Start))
+                .Subscribe(_ =>
+                {
+                    _gameUI.SoundHandler.Play("ClickUi1");
+                    _gameStateHandler.ChangeState(GameStates.Start);
+                })
                 .AddTo(this);
         }
 
         private void OnDestroy()
         {
+            _gameUI.SoundHandler.StopAllSounds();
             collectablesSpawner.Dispose();
             RaceMovement.Dispose();
         }

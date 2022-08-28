@@ -17,6 +17,7 @@ public class PlaySceneInstaller : MonoInstaller
     [field: BoxGroup("Collectable prefabs:")] [field: SerializeField] public AccelerateBonus AccelerateBonus { get; private set; }
     [field: BoxGroup("Collectable prefabs:")] [field: SerializeField] public DeccelerateBonus DeccelerateBonus { get; private set; }
     [field: BoxGroup("Collectable prefabs:")] [field: SerializeField] public BombBonus BombBonus { get; private set; }
+    [field: BoxGroup("Sound handler:")] [field: SerializeField] public SoundHandler SoundHandler { get; private set; }
     
     
     public override void InstallBindings()
@@ -26,6 +27,7 @@ public class PlaySceneInstaller : MonoInstaller
         Container.BindFactory<AccelerateBonus, AccelerateBonus.Factory>().FromComponentInNewPrefab(AccelerateBonus);
         Container.BindFactory<DeccelerateBonus, DeccelerateBonus.Factory>().FromComponentInNewPrefab(DeccelerateBonus);
         Container.BindFactory<BombBonus, BombBonus.Factory>().FromComponentInNewPrefab(BombBonus);
+        Container.BindFactory<SoundHandler, SoundHandler.Factory>().FromComponentInNewPrefab(SoundHandler);
         Container.Bind<CollectablesSpawner>().AsSingle();
         Container.BindInstance(GameUI).AsSingle();
         Container.Bind<IMoveController>().To<DynamicJoystick>().FromComponentInNewPrefab(DynamicJoystick).UnderTransform(GameScreen.transform).AsSingle();
