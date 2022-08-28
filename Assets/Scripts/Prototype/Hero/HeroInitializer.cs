@@ -53,8 +53,8 @@ namespace NascarSurvival
             RaceMovement.ObserveEveryValueChanged(x => x.CurrentSpeed)
                 .Subscribe(x =>
                 {
-                    _gameUI.SpeedText.DOCounter(_previousValue, x, 0.1f).SetEase(Ease.Linear);
-                    _previousValue = x;
+                    _gameUI.SpeedText.DOCounter(_previousValue, (int)x, 0.1f).SetEase(Ease.Linear);
+                    _previousValue = (int)x;
                 })
                 .AddTo(this);
 

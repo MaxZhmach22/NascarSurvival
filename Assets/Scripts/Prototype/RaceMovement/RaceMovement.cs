@@ -10,13 +10,13 @@ namespace NascarSurvival
 {
     public class RaceMovement : IDisposable
     {
-        public int CurrentSpeed => _lengthOfTheVector;
+        public float CurrentSpeed => _lengthOfTheVector;
         public float StartCounter => _startCounter;
 
         private float _startCounter;
         private float _currentSpeed;
       
-        private int _lengthOfTheVector;
+        private float _lengthOfTheVector;
         private bool _bonusSpeedEffect;
         private Vector3 _acceleratedVector;
         private readonly GameStateHandler _gameStateHandler;
@@ -27,8 +27,8 @@ namespace NascarSurvival
         private readonly FinishZone _finisZone;
         private float _startSpeedScalar;
         private bool _isPlayerControl;
-        private float _deadZone = 0.1f;
-        private float _previousCurrentXAxes;
+        private float _deadZone = 0.03f;
+        private float _previousCurrentYAxes;
         private bool _isDotweening;
 
 
@@ -41,7 +41,7 @@ namespace NascarSurvival
             _gameStateHandler = gameStateHandler;
             _objectSettings = objectSettings;
             _finisZone = finisZone;
-            _currentSpeed = _objectSettings.SensitiveXaxes;
+            _currentSpeed = _objectSettings.StartSpeed;
             _startCounter = 4;
             _isPlayerControl = _movingController is DynamicJoystick;
             
@@ -114,7 +114,7 @@ namespace NascarSurvival
         private void StartDecelerationMovement()
         {
             _startCounter -= Time.deltaTime * _objectSettings.StartAccelerationTime;
-            _startCounter = Mathf.Clamp(_startCounter, 0, _objectSettings.StartSpeedToAccelerate);
+            _startCounter = Mathf.Clamp(_startCounter, 0, _objectSettings.StartSpeed);
             _objectSettings.transform.position +=_objectSettings.transform.forward + Vector3.forward * _startCounter * Time.deltaTime;
         }
         
@@ -127,27 +127,28 @@ namespace NascarSurvival
             {
                 var currentXAxes = _movingController.Movement.y * _objectSettings.SensitiveYaxes;
                 
-                if (Mathf.Abs(currentXAxes - _previousCurrentXAxes) > _deadZone)
+                if (Mathf.Abs(currentXAxes - _previousCurrentYAxes) > _deadZone)
                 {
                     if(_isDotweening) return;
                     
-                    DOTween.To(() => _previousCurrentXAxes, x => _previousCurrentXAxes = x, currentXAxes, 0.5f)
+                    DOTween.To(() => _previousCurrentYAxes, x => _previousCurrentYAxes = x, currentXAxes, 0.5f)
                         .SetEase(Ease.Linear)
                         .SetUpdate(UpdateType.Fixed)
                         .OnStart(() => _isDotweening = true)
                         .OnUpdate(() =>
                         {
                             forwardControllerVector =
-                                new Vector3(0, 0, 1f + _previousCurrentXAxes) * _currentSpeed * Time.deltaTime;
+                                new Vector3(0, 0, 1f + _previousCurrentYAxes) * _currentSpeed * Time.deltaTime;
                             rotation = new Vector3(_movingController.Movement.x, 0, 0) *
-                                       _objectSettings.SensitiveYaxes *
+                                       _objectSettings.SensitiveXaxes *
                                        Time.deltaTime;
                             _objectSettings.transform.position += rotation + forwardControllerVector;
+                            _lengthOfTheVector = forwardControllerVector.z * 1000f;
                         })
                         .OnComplete(() =>
                         {
                             _isDotweening = false;
-                            _previousCurrentXAxes = currentXAxes;
+                            _previousCurrentYAxes = currentXAxes;
                         });
                 }
                 else
@@ -156,10 +157,10 @@ namespace NascarSurvival
                     
                     forwardControllerVector =
                         new Vector3(0, 0, 1f + currentXAxes) * _currentSpeed * Time.deltaTime;
-                    rotation = new Vector3(_movingController.Movement.x, 0, 0) * _objectSettings.SensitiveYaxes *
+                    rotation = new Vector3(_movingController.Movement.x, 0, 0) * _objectSettings.SensitiveXaxes *
                                Time.deltaTime;
                     _objectSettings.transform.position += rotation + forwardControllerVector;
-                    _previousCurrentXAxes = currentXAxes;
+                    _previousCurrentYAxes = currentXAxes;
                 }
             }
             else
@@ -173,7 +174,7 @@ namespace NascarSurvival
             _objectSettings.transform.position = new Vector3(clampBorders, _objectSettings.transform.position.y,
                 _objectSettings.transform.position.z);
 
-            //_lengthOfTheVector = forwardControllerVector.z + _acceleratedVector.z;
+            _lengthOfTheVector = forwardControllerVector.z * 1000f;
         }
 
         public async void BonusSpeedEffect(float bonusToSpeed, float acceletartionTime, float activeTime)
