@@ -28,7 +28,6 @@ namespace NascarSurvival
 
         private void Start()
         {
-            Debug.Log("asdas");
             Play("MainTheme");
         }
 
