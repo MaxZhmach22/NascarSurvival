@@ -47,7 +47,7 @@ MonoBehaviour:
   - Name: MainTheme
     AudioClip: {fileID: 8300000, guid: bc7354076e542b94a96227253821e461, type: 3}
     AudioSource: {fileID: 0}
-    Volume: 1
+    Volume: 0.7
     Pitch: 1
     Looped: 1
     PlayOnAwake: 1

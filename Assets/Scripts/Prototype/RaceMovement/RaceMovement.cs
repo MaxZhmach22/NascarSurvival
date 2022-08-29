@@ -36,6 +36,7 @@ namespace NascarSurvival
         private bool _isDotweening;
         private bool _isBoomed;
         private Transform _model;
+        private Vector3 _playerRotation;
 
 
         public RaceMovement(IMoveController movingController, 
@@ -85,14 +86,10 @@ namespace NascarSurvival
         {
             Observable.EveryFixedUpdate()
                 .TakeWhile(_ => _objectSettings.transform.position.z < _finisZone.transform.position.z)
-                .DoOnSubscribe(() => _gameUI.SoundHandler.Play("Engine01"))
+                .DoOnSubscribe(() => _gameUI.SoundHandler.Play("Engine03"))
                 .DoOnTerminate(() =>
                 {
-                    Observable.EveryFixedUpdate()
-                        .TakeWhile(_ => _currentSpeed > 0)
-                        .DoOnTerminate(() => EndGame())
-                        .Subscribe(_ => StartDecelerationMovement())
-                        .AddTo(_disposable);
+                    EndGame();
                 })
                 .Subscribe(_ => ConstantForwardMovement())
                 .AddTo(_disposable);
@@ -100,21 +97,23 @@ namespace NascarSurvival
 
         private void EndGame()
         {
-            DecelerationMovement();
             var state = _movingController is DynamicJoystick ? GameStates.Finish : GameStates.Defeat;
+            if (state == GameStates.Finish && _isPlayerControl)
+            {
+                _gameUI.SoundHandler.Play("WinSound");
+            }
+
+            if (state == GameStates.Defeat && _isPlayerControl)
+            {
+                _gameUI.SoundHandler.Play("LooseSound");
+            }
+          
             _gameStateHandler.ChangeState(state);
         }
 
         private void DecelerationMovement()
         {
-            Observable.EveryUpdate()
-                .TakeWhile(_ => _startCounter > 0)
-                .DoOnTerminate(() =>
-                {
-                    // Debug.Log("<color=red>Stopped!</color>");
-                })
-                .Subscribe(_ => StartDecelerationMovement())
-                .AddTo(_disposable);
+           EndGame();
         }
 
         private void StartAccelerationMovement()
@@ -124,19 +123,12 @@ namespace NascarSurvival
             //_lengthOfTheVector = _acceleratedVector.z * 500;
         }
         
-        private void StartDecelerationMovement()
-        {
-            _currentSpeed -= Time.deltaTime * _objectSettings.StartAccelerationTime;
-            _currentSpeed = Mathf.Clamp(_currentSpeed, 0, _objectSettings.StartSpeed);
-            _objectSettings.transform.position +=_objectSettings.transform.forward + Vector3.forward * _currentSpeed * Time.deltaTime;
-        }
         
         private void ConstantForwardMovement()
         {
             if (_isBoomed)  return;
 
             var forwardControllerVector = Vector3.zero;
-            var rotation = Vector3.zero;
             
             if (_isPlayerControl)
             {
@@ -154,12 +146,12 @@ namespace NascarSurvival
                         {
                             forwardControllerVector =
                                 new Vector3(0, 0, 1f + _previousCurrentYAxes) * _currentSpeed * Time.deltaTime;
-                            rotation = new Vector3(_movingController.Movement.x, 0, 0) *
+                            _playerRotation += new Vector3(_movingController.Movement.x, 0, 0) *
                                        _objectSettings.SensitiveXaxes *
                                        Time.deltaTime;
-                            _objectSettings.transform.position += rotation + forwardControllerVector;
+                            _objectSettings.transform.position += _playerRotation + forwardControllerVector;
                             _lengthOfTheVector = forwardControllerVector.z * 1000f;
-                            _model.transform.rotation = Quaternion.Euler(new Vector3(0,rotation.x * 800,0));
+                            _model.transform.rotation = Quaternion.Euler(new Vector3(0,_playerRotation.x * 800,0));
                         })
                         .OnComplete(() =>
                         {
@@ -173,11 +165,11 @@ namespace NascarSurvival
                     
                     forwardControllerVector =
                         new Vector3(0, 0, 1f + currentXAxes) * _currentSpeed * Time.deltaTime;
-                    rotation = new Vector3(_movingController.Movement.x, 0, 0) * _objectSettings.SensitiveXaxes *
-                               Time.deltaTime;
-                    _objectSettings.transform.position += rotation + forwardControllerVector;
+                    _playerRotation += new Vector3(_movingController.Movement.x, 0, 0) * _objectSettings.SensitiveXaxes *
+                                      Time.deltaTime;
+                    _objectSettings.transform.position += _playerRotation + forwardControllerVector;
                     _previousCurrentYAxes = currentXAxes;
-                    _model.transform.rotation = Quaternion.Euler(new Vector3(0,rotation.x * 800,0));
+                    _model.transform.rotation = Quaternion.Euler(new Vector3(0,_playerRotation.x * 800,0));
                 }
 
                 
@@ -190,7 +182,7 @@ namespace NascarSurvival
                 _objectSettings.transform.position += forwardControllerVector;
             }
   
-            var clampBorders = Mathf.Clamp(_objectSettings.transform.position.x, -5, 5);
+            var clampBorders = Mathf.Clamp(_objectSettings.transform.position.x, -10, 10);
             _objectSettings.transform.position = new Vector3(clampBorders, _objectSettings.transform.position.y,
                 _objectSettings.transform.position.z);
 

@@ -18,6 +18,7 @@ namespace Prototype.AI
         private readonly AIMovementController _aiMovementController;
         private readonly CollectablesSpawner _collectableSpawner;
         private readonly CompositeDisposable _disposable = new CompositeDisposable();
+        private AccelerateBonus _lastNearestBonus;
         
 
         public AiBehaviour(EnemySettings enemySettings, AIMovementController aiMovementController, CollectablesSpawner collectableSpawner)

@@ -114,6 +114,7 @@ namespace NascarSurvival
             if (SoundHandler == null)
             {
                 SoundHandler = _soundFactory.Create();
+                DontDestroyOnLoad(SoundHandler);
             }
         }
 

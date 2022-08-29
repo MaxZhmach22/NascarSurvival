@@ -36,8 +36,21 @@ namespace NascarSurvival.Collectable
             _bonusesParent = new GameObject("Bonuses Parent").transform;
             
             AccelerateBonusSpawnSequence();
+            DeccelerateBonusSpawnSequence();
             BombBonusSpawnSequence();
             BonusListObservable();
+        }
+
+        private void DeccelerateBonusSpawnSequence()
+        {
+            var timer = TakeRandomTime(_collectableSpawnSettings.DeccelerateBonusMinTimeToSpwan, _collectableSpawnSettings.DeccelerateBonusMaxTimeToSpwan);
+
+            Observable.Timer(TimeSpan.FromSeconds(timer))
+                .Where(_ => _gameStateHandler.CurrentGameState == GameStates.Start)
+                .DoOnTerminate(() => DeccelerateBonusSpawnSequence())
+                // .DoOnSubscribe(() => Debug.Log($"New timer value {timer}"))
+                .Subscribe(_ => CreateDeccelerateBonus())
+                .AddTo(_disposable);
         }
 
         private void BombBonusSpawnSequence()
@@ -77,7 +90,7 @@ namespace NascarSurvival.Collectable
             var bonus = _accelerationBonusFactory.Create();
             bonus.transform.SetParent(_bonusesParent);
             var pos = Vector3.Lerp(_collectableSpawnSettings.transform.position, _finishZone.transform.position, Random.Range(0.1f, 0.8f));
-            pos.Set(Random.Range(-4,4), 2, pos.z);
+            pos.Set(Random.Range(-8,8), 8, pos.z);
             bonus.gameObject.transform.position = pos;
             AccelerateBonusList.Add(bonus);
             // Debug.Log($"<color=cyan>Instanciated{bonus}</color>",bonus);
@@ -89,7 +102,17 @@ namespace NascarSurvival.Collectable
             var bonus = _bombBonusFactory.Create();
             bonus.transform.SetParent(_bonusesParent);
             var pos = Vector3.Lerp(_collectableSpawnSettings.transform.position, _finishZone.transform.position, Random.Range(0.1f, 0.8f));
-            pos.Set(Random.Range(-4,4), 5, pos.z);
+            pos.Set(Random.Range(-8,8), 8, pos.z);
+            bonus.gameObject.transform.position = pos;
+            // Debug.Log($"<color=cyan>Instanciated{bonus}</color>",bonus);
+        }
+        
+        private void CreateDeccelerateBonus()
+        {
+            var bonus = _deccelerationBonusFactory.Create();
+            bonus.transform.SetParent(_bonusesParent);
+            var pos = Vector3.Lerp(_collectableSpawnSettings.transform.position, _finishZone.transform.position, Random.Range(0.1f, 0.8f));
+            pos.Set(Random.Range(-8,8), 8, pos.z);
             bonus.gameObject.transform.position = pos;
             // Debug.Log($"<color=cyan>Instanciated{bonus}</color>",bonus);
         }

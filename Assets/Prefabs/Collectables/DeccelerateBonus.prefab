@@ -125,6 +125,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2251a2b7ce0e45bfaf4d08ccab1eb4f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Value>k__BackingField: 5
+  <Value>k__BackingField: 2
   <Duration>k__BackingField: 3
   <TimeBeforeStart>k__BackingField: 1
