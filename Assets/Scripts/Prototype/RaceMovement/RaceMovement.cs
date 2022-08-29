@@ -22,12 +22,6 @@ namespace NascarSurvival
         private float _lengthOfTheVector;
         private bool _bonusSpeedEffect;
         private Vector3 _acceleratedVector;
-        private readonly GameStateHandler _gameStateHandler;
-        private readonly IMoveController _movingController;
-        private readonly CompositeDisposable _disposable = new CompositeDisposable();
-        private readonly CancellationTokenSource _cancellationToken = new CancellationTokenSource();
-        private readonly ObjectSettings _objectSettings;
-        private readonly FinishZone _finisZone;
         private readonly GameUI _gameUI;
         private float _startSpeedScalar;
         private bool _isPlayerControl;
@@ -37,6 +31,12 @@ namespace NascarSurvival
         private bool _isBoomed;
         private Transform _model;
         private Vector3 _playerRotation;
+        private readonly GameStateHandler _gameStateHandler;
+        private readonly IMoveController _movingController;
+        private readonly CompositeDisposable _disposable = new CompositeDisposable();
+        private readonly CancellationTokenSource _cancellationToken = new CancellationTokenSource();
+        private readonly ObjectSettings _objectSettings;
+        private readonly FinishZone _finisZone;
 
 
         public RaceMovement(IMoveController movingController, 
@@ -85,7 +85,12 @@ namespace NascarSurvival
         private void ConstantMovementSequence()
         {
             Observable.EveryFixedUpdate()
-                .TakeWhile(_ => _objectSettings.transform.position.z < _finisZone.transform.position.z)
+                .TakeWhile(_ =>
+                {
+                    if (_objectSettings == null) return false;
+                    
+                    return _objectSettings.transform.position.z < _finisZone.transform.position.z;
+                })
                 .DoOnSubscribe(() => _gameUI.SoundHandler.Play("Engine03"))
                 .DoOnTerminate(() =>
                 {

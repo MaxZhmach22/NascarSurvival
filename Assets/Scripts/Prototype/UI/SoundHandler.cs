@@ -15,8 +15,6 @@ namespace NascarSurvival
         
         private void Awake()
         {
-            DontDestroyOnLoad(this);
-            
             foreach (var sound in _sounds)
             {
                 sound.AudioSource = gameObject.AddComponent<AudioSource>();
@@ -30,6 +28,7 @@ namespace NascarSurvival
 
         private void Start()
         {
+            Debug.Log("asdas");
             Play("MainTheme");
         }
 
@@ -70,11 +69,6 @@ namespace NascarSurvival
                 if(!sound.Name.Contains("MainTheme"))
                     sound.AudioSource.Stop();
             });
-        }
-        
-        public class Factory : PlaceholderFactory<SoundHandler>
-        {
-            
         }
     }
 }

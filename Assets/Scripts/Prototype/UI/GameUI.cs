@@ -15,6 +15,7 @@ namespace NascarSurvival
         [field: Foldout("References")] [field: SerializeField] public VictoryScreen VictoryScreen { get; private set; }
         [field: Foldout("References")] [field: SerializeField] public DefeatScreen DefeatScreen { get; private set; }
         [field: Foldout("References")] [field: SerializeField] public GameScreen GameScreen { get; private set; }
+        [field: Foldout("References")] [field: SerializeField] public Button GameMuteButton { get; private set; }
         [field: Foldout("References")] [field: SerializeField] public TMP_Text SpeedText { get; private set; }
         [field: Foldout("References")] [field: SerializeField] public TMP_Text GameMessages { get; private set; }
         [field: Foldout("References")] [field: SerializeField] public TMP_Text TextLevel { get; private set; }
@@ -22,18 +23,17 @@ namespace NascarSurvival
         private List<GameObject> _screens = new List<GameObject>();
         private GameStateHandler _gameStateHandler;
         public SoundHandler SoundHandler { get; private set; }
-        public SoundHandler.Factory _soundFactory;
 
         [Inject]
-        private void Init(GameStateHandler gameStateHandler, SoundHandler.Factory soundFactory)
+        private void Init(GameStateHandler gameStateHandler, SoundHandler soundHandler)
         {
             _gameStateHandler = gameStateHandler;
-            _soundFactory = soundFactory;
+            SoundHandler = soundHandler;
         }
         
         private void Start()
         {
-            FindSoundHandler();
+            
             
             _screens.Add(VictoryScreen.gameObject);
             _screens.Add(DefeatScreen.gameObject);
@@ -79,6 +79,14 @@ namespace NascarSurvival
                     new LoadSceneHandler().ReloadCurrentScene();
                 })
                 .AddTo(this);
+
+            GameMuteButton.OnClickAsObservable()
+                .Subscribe(_ =>
+                {
+                    SoundHandler.MuteMusic();
+                    SoundHandler.MuteSounds();
+                })
+                .AddTo(this);
         }
 
         private void OnChangeState(GameStates state)
@@ -108,18 +116,9 @@ namespace NascarSurvival
             _screens.ForEach(x => x.gameObject.SetActive(false));
         }
         
-        private void FindSoundHandler()
-        {
-            SoundHandler = FindObjectOfType<SoundHandler>();
-            if (SoundHandler == null)
-            {
-                SoundHandler = _soundFactory.Create();
-                DontDestroyOnLoad(SoundHandler);
-            }
-        }
-
         private void OnDestroy()
         {
+            SoundHandler.StopAllSounds();
             _gameStateHandler.OnChangeState -= OnChangeState;
         }
     }

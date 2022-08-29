@@ -6,6 +6,7 @@ using TMPro;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 
 namespace NascarSurvival
@@ -24,27 +25,21 @@ namespace NascarSurvival
         [field: Foldout("References")] [field: SerializeField] public Button ResetProgressButton { get; private set; }
         private List<GameObject> _menus = new List<GameObject>();
         private SoundHandler _soundHandler;
-
+        
+        [Inject]
+        private void Init (SoundHandler soundHandler)
+        {
+            _soundHandler = soundHandler;
+        }
 
         private void Awake()
         {
-            FindSoundHandler();
-            
             _menus.Add(SettingsMenu);
             _menus.Add(MainMenu);
             MainMenu.gameObject.SetActive(true);
             Bind();
         }
-
-        private void FindSoundHandler()
-        {
-            _soundHandler = FindObjectOfType<SoundHandler>();
-            if (_soundHandler == null)
-            {
-                _soundHandler = new GameObject("SoundHandler").AddComponent<SoundHandler>();
-            }
-        }
-
+        
         private void Bind()
         {
             SettingsButton.OnClickAsObservable()
