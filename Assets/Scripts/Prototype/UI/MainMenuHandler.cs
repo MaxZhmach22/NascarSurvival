@@ -65,8 +65,7 @@ namespace NascarSurvival
             _menus.Add(MainMenu);
             // _menus.Add(CreateAccountPanel);
             // _menus.Add(RegisterPanel);
-            
-           // RegisterPanel.gameObject.SetActive(true);
+            // RegisterPanel.gameObject.SetActive(true);
             //MainMenu.gameObject.SetActive(true);
             Bind();
            // CreateObservableOnAccountText();

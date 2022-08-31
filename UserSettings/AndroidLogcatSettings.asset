@@ -2,8 +2,8 @@
     "m_SelectedDeviceId": "5144912d",
     "m_SelectedPackage": {
         "deviceId": "5144912d",
-        "name": "com.DefaultCompany.FlappyBirdDemo",
-        "processId": 30715,
+        "name": "com.MyGames.NascarSurvival",
+        "processId": 23377,
         "exited": false
     },
     "m_SelectedPriority": 0,
@@ -60,6 +60,12 @@
             "deviceId": "5144912d",
             "name": "com.DefaultCompany.FlappyBirdDemo",
             "processId": 30715,
+            "exited": false
+        },
+        {
+            "deviceId": "5144912d",
+            "name": "com.MyGames.NascarSurvival",
+            "processId": 23377,
             "exited": false
         }
     ],
